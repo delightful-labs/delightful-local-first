@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-14
 
-**Status**: Draft — portable data abstraction and v1 query baseline selected; transaction guarantees and cross-app identity remain unresolved.
+**Status**: Draft — portable data abstraction, v1 query baseline, and optional transaction capabilities selected; cross-app identity remains unresolved.
 
 **Input**: Create a shared foundation for Delightful apps, informed by Finance and Clipper, with independently maintained local-first backend plugins, identity/workspace behavior, Svelte bindings, and DUI-based dialogs/popovers. Specify only; do not implement or migrate either app.
 
@@ -14,6 +14,7 @@
 
 - Q: Should apps use a shared data interface across backends, or keep backend-specific schemas and queries? → A: Use a shared data interface (Option A), with a deliberately modest first version. Apps own their domain schemas; the foundation defines their portable expression and supported queries, subscriptions, and mutations, which plugins translate. Begin with concrete consumer needs and validate against two real backends before stabilizing the contract. The initial operation set and transaction guarantees remain to be clarified.
 - Q: How much data querying should the first portable version support? → A: Practical baseline (Option B): typed records, explicit record-ID references, create/read/update/delete, equality and null checks, range filters, combined AND filters, field sorting, bounded result lists, and reactive observations. Related records use separate observations. Joins, aggregates, OR filters, pagination, and full-text search are deferred. Capabilities may be added later through versioned contract evolution and conformance checks; transaction guarantees remain a separate decision.
+- Q: When an operation changes several records, what must every qualified backend guarantee? → A: Transactions are explicit optional capabilities (Option B), separating atomic local multi-record persistence from authority-validated transactions. Apps requiring either capability must reject plugins lacking it. Subscription visibility must be documented separately; local atomicity does not imply atomic remote observation or preservation of business invariants under concurrent offline changes.
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -69,7 +70,7 @@ An app developer defines domain schemas and accesses supported data through a sh
 
 **Why this priority**: Portable data access and reusable reactive loading reduce backend coupling across apps; the first version must remain limited to agreed consumer needs.
 
-**Independent Test**: Run the same app-defined schemas, record operations, and baseline filtered/sorted/bounded observations through both qualified backends; restart offline and reconnect without changing portable consumer data code. Multi-record scenarios await the transaction decision.
+**Independent Test**: Run the same app-defined schemas, record operations, and baseline filtered/sorted/bounded observations through both qualified backends; restart offline and reconnect without changing portable consumer data code. Separately qualify any declared transaction capabilities and verify rejection when an app requires an unsupported capability.
 
 **Acceptance Scenarios**:
 
@@ -79,6 +80,9 @@ An app developer defines domain schemas and accesses supported data through a sh
 4. **Given** locally accepted changes and subsequent reconnection, **When** the backend synchronizes authorized data, **Then** the app can distinguish local success from synchronization status without treating network connectivity as proof of synchronization.
 5. **Given** app-defined schemas and data operations within the agreed portable capability set, **When** the demonstration runs with either qualified backend, **Then** its schema declarations and consumer data access code remain unchanged; deployment configuration selects the plugin. This does not migrate existing data or identities.
 6. **Given** typed records with ID references and a query combining workspace equality, a null check, a date range, field sorting, and a result bound, **When** records are created, updated, or deleted, **Then** the observation reflects the matching bounded results through both qualified backends. Related records can be observed separately without requiring joins.
+7. **Given** a plugin declaring atomic local multi-record persistence, **When** a grouped write fails or the app restarts offline after local durability is acknowledged, **Then** the persisted result contains all of the group's changes or none, never a partial group.
+8. **Given** an app requiring authority-validated transactions, **When** validation is unavailable or a concurrent conflict invalidates the operation, **Then** the operation remains explicitly pending or fails without reporting authority acceptance; an accepted operation meets the declared invariant-validation guarantee.
+9. **Given** an app requiring either transaction capability, **When** its selected plugin lacks that capability, **Then** qualification fails before dependent operations execute.
 
 ### User Story 5 - Compose shared interactions without adopting full screens (Priority: P2)
 
@@ -119,7 +123,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **FR-007**: The foundation MUST support private personal workspaces and invited shared workspaces with explicit read/write membership.
 - **FR-008**: App developers MUST be able to extend authorization with domain-specific restrictions enforced at the backend/storage boundary. UI filtering alone MUST NOT qualify as enforcement.
 - **FR-009**: The foundation MUST provide observable startup, loading, ready, empty, and error outcomes and release obsolete observations when consumers, sessions, or workspaces change.
-- **FR-010**: The foundation MUST define a shared data interface for app-owned domain schemas, queries, subscriptions, and mutations, translated by each backend plugin. Portable consumer data code MUST NOT require backend-specific schemas or APIs. The first version MUST be limited to concrete consumer needs and validated against two real backends before the contract is stabilized; it MUST NOT promise universal backend feature parity. [NEEDS CLARIFICATION: Q1 follow-up — settle multi-record transaction guarantees before defining dependent APIs or promising parity].
+- **FR-010**: The foundation MUST define a shared data interface for app-owned domain schemas, queries, subscriptions, and mutations, translated by each backend plugin. Portable consumer data code MUST NOT require backend-specific schemas or APIs. The first version MUST be limited to concrete consumer needs and validated against two real backends before the contract is stabilized; it MUST NOT promise universal backend feature parity. FR-020 defines the mandatory data baseline; FR-022 defines optional transaction capabilities.
 - **FR-011**: For operations advertised as locally durable, acknowledged changes MUST survive an offline restart. Local durability and later synchronization outcomes MUST remain distinguishable.
 - **FR-012**: Whether identities are shared between Delightful apps is [NEEDS CLARIFICATION: Q2 — choose separate app identities or shared cross-app identity, including isolation expectations; reusable account behavior does not by itself establish single sign-on].
 - **FR-013**: The foundation MUST offer Svelte bindings and DUI-based account/recovery, device-linking, and workspace-membership dialogs/popovers; consumer apps MUST retain ownership of full screens, routes, layouts, and domain workflows.
@@ -131,6 +135,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **FR-019**: Plugin qualification MUST document offline availability, failure semantics, permission-change timing, and relevant capability limits. Other plugins need not be created or maintained by this project.
 - **FR-020**: The mandatory v1 portable data baseline MUST support typed records, explicit record-ID references, create/read/update/delete, reactive observations, equality filters, null checks, range filters, combined AND filters, field sorting, and bounded result lists. Related records MUST be accessible through separate observations; portable joins are not required. A result bound MUST NOT imply pagination support.
 - **FR-021**: Portable joins, aggregates, OR filters, pagination, and full-text search are deferred from v1. Future capabilities MAY be added through explicit versioned contract evolution and conformance checks. Apps MUST declare any newly required capabilities, and plugins lacking them MUST fail qualification rather than silently approximate their behavior. Promoting an optional capability to mandatory MUST be an explicit compatibility decision.
+- **FR-022**: Multi-record transactions MUST be explicit optional capabilities, distinguishing (a) atomic local multi-record persistence, where a grouped write persists all changes or none and acknowledged local durability survives an offline restart, from (b) authority-validated transactions, where acceptance depends on validation of related reads and writes against concurrent conflicts at an authority. Authority unavailability MUST NOT be reported as acceptance. Neither capability implies the other. Apps MUST declare the capabilities they require; unsupported requirements MUST block qualification and dependent operations. Plugins MUST document subscription visibility separately, including whether other devices can observe partial groups; local atomicity MUST NOT imply atomic remote visibility or preservation of cross-record business invariants under concurrent offline changes. Each declared capability MUST have reusable conformance checks; the mandatory v1 baseline does not require either transaction capability.
 
 ### Key Entities _(include if feature involves data)_
 
@@ -140,7 +145,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **Workspace**: A personal or shared boundary for protected app data, independent of Finance's financial accounts.
 - **Membership and invitation**: Granted workspace access and the process by which another identity accepts access.
 - **Permission extension**: App-specific authorization beyond baseline workspace read/write membership.
-- **Portable domain schema and data operation**: An app-owned typed record model with explicit record-ID references, and its baseline queries, subscriptions, and mutations expressed through the foundation's shared interface and translated by plugins; multi-record transaction guarantees remain unresolved.
+- **Portable domain schema and data operation**: An app-owned typed record model with explicit record-ID references, and its baseline queries, subscriptions, and mutations expressed through the foundation's shared interface and translated by plugins; multi-record transactions are separately declared optional capabilities.
 - **Observation and operation outcome**: Consumer-visible data readiness, errors, durability, and synchronization information across qualified backend implementations.
 
 ## Success Criteria _(mandatory)_
@@ -157,7 +162,9 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **SC-008**: All required shared interactions can be embedded without adopting a foundation-owned screen or router and can be completed with keyboard input.
 - **SC-009**: The demonstration uses identical portable domain schema declarations and consumer data access code with both qualified backends for every agreed required data scenario, without per-app backend adapters for those scenarios.
 
-These are future implementation acceptance criteria, not claims that this specification-only phase has exercised or satisfied them. Multi-record acceptance criteria must be refined after the Q1 follow-up establishes transaction guarantees.
+- **SC-010**: Every declared transaction capability passes its conformance scenarios, including failure/conflict handling and offline restart for atomic local persistence. Every scenario requiring an absent transaction capability fails qualification before dependent operations execute. Subscription visibility limits are recorded separately.
+
+These are future implementation acceptance criteria, not claims that this specification-only phase has exercised or satisfied them. Optional transaction capabilities are qualified separately from the mandatory baseline; an app's required capability set remains authoritative.
 
 ## Assumptions
 
@@ -170,7 +177,7 @@ These are future implementation acceptance criteria, not claims that this specif
 - Binary-storage abstraction and app-specific file replication/download policies are deferred. This draft makes no promise of file parity.
 - Clipper starts fresh if later revived. Legacy Webnative/Fission recovery/import, Clipper restoration, and Finance migration are outside this feature.
 - This phase creates a local repository and Spec Kit specification/checklist only: no library/app code, consumer changes, tests, commits, or GitHub publishing.
-- Q1's architectural direction is a shared portable data interface with the practical v1 baseline in FR-020. Multi-record transaction guarantees remain open; Q2 (cross-app identity) remains unanswered. This draft requires further clarification before dependent implementation planning.
+- Q1 is resolved at the requirements level: a shared portable data interface with the practical mandatory v1 baseline in FR-020 and explicit optional transaction capabilities in FR-022. Concrete interfaces and detailed conformance design belong to later design. Q2 (cross-app identity) remains unanswered and requires clarification before dependent implementation planning.
 
 ## Reference Evidence and Follow-up
 
