@@ -15,10 +15,10 @@ Checked items indicate specification quality, not completed implementation or pa
 
 ## Requirement Completeness
 
-- [ ] No unresolved clarification markers remain: Q1 (FR-010) and Q2 (FR-012) intentionally remain open.
-- [ ] All requirements are unambiguous: the data boundary and cross-app identity require clarification.
+- [x] No unresolved clarification markers remain: Q1 and Q2 are resolved at the requirements level.
+- [x] The data boundary, mandatory v1 operations, optional transaction capabilities, and backend-native cross-app identity access consequences are explicit (FR-010, FR-012, FR-020–FR-022).
 - [x] Success criteria are measurable behavior outcomes rather than implementation prescriptions.
-- [ ] All acceptance scenarios are final: Story 4 and data-related criteria depend on Q1; identity scope depends on Q2.
+- [x] Acceptance scenarios cover portable baseline operations, optional transaction guarantees, identity reuse/access disclosure, and storage-enforced membership/domain permissions; concrete conformance design remains later work.
 - [x] Edge cases include incompatible plugins, capability gaps, lifecycle cleanup, offline failures, and authorization limits.
 - [x] Scope excludes application migrations, Clipper revival, binary-storage policy, publishing, and implementation.
 - [x] Dependencies and assumptions identified, including unqualified DXOS candidacy.
@@ -30,11 +30,12 @@ Checked items indicate specification quality, not completed implementation or pa
 - [x] Two real backends are required for parity; a fake cannot replace the second backend.
 - [x] Baseline workspaces permit storage-enforced app-specific authorization extensions.
 - [x] DUI primitives and foundation-owned compositions have separate ownership.
-- [ ] Ready for implementation planning: resolve Q1/Q2 and refine affected scenarios first.
+- [x] Ready for technical design and qualification planning: Q1/Q2 are resolved and affected scenarios refined; implementation remains separately authorized.
 
 ## Notes
 
-- Initial quality review completed. Open items are intentional discussion points, not implementation TODOs.
-- The user's instruction to preserve unanswered questions takes precedence over the specify workflow's normal requirement to resolve them before completion.
+- Specification quality review reconciled with the user's approved clarification decisions. All 17 items pass at the requirements level; this does not establish technical feasibility.
+- Q1 selects a portable data interface with the practical v1 baseline and explicit optional transaction capabilities. Q2 selects explicit identity reuse within a backend with documented native access consequences, without a universal app security boundary.
 - No extension hooks are installed in this new repository; none were executed.
-- No runtime tests or backend qualification were performed. The next step is specification clarification.
+- No runtime tests or backend qualification were performed. Documentation research informed discussion but does not qualify Jazz or DXOS.
+- The next task is technical design and qualification planning. In particular, verify documented identity/account mapping and shared authority, baseline query semantics, durability, recovery, and optional transaction guarantees against pinned backend versions. DXOS remains a candidate; unsupported mandatory requirements must block selection or prompt an explicit scope decision.
