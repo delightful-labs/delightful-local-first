@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-14
 
-**Status**: Draft — portable data abstraction, v1 query baseline, and optional transaction capabilities selected; cross-app identity remains unresolved.
+**Status**: Draft — requirements clarified for design review; backend feasibility and qualification remain unverified.
 
 **Input**: Create a shared foundation for Delightful apps, informed by Finance and Clipper, with independently maintained local-first backend plugins, identity/workspace behavior, Svelte bindings, and DUI-based dialogs/popovers. Specify only; do not implement or migrate either app.
 
@@ -15,6 +15,7 @@
 - Q: Should apps use a shared data interface across backends, or keep backend-specific schemas and queries? → A: Use a shared data interface (Option A), with a deliberately modest first version. Apps own their domain schemas; the foundation defines their portable expression and supported queries, subscriptions, and mutations, which plugins translate. Begin with concrete consumer needs and validate against two real backends before stabilizing the contract. The initial operation set and transaction guarantees remain to be clarified.
 - Q: How much data querying should the first portable version support? → A: Practical baseline (Option B): typed records, explicit record-ID references, create/read/update/delete, equality and null checks, range filters, combined AND filters, field sorting, bounded result lists, and reactive observations. Related records use separate observations. Joins, aggregates, OR filters, pagination, and full-text search are deferred. Capabilities may be added later through versioned contract evolution and conformance checks; transaction guarantees remain a separate decision.
 - Q: When an operation changes several records, what must every qualified backend guarantee? → A: Transactions are explicit optional capabilities (Option B), separating atomic local multi-record persistence from authority-validated transactions. Apps requiring either capability must reject plugins lacking it. Subscription visibility must be documented separately; local atomicity does not imply atomic remote observation or preservation of business invariants under concurrent offline changes.
+- Q: Should users have separate identities for each Delightful app, or one identity they can use across apps? → A: Reusable identity with isolated apps (Option B): users can explicitly reuse an existing identity across apps using the same qualified backend. Identity reuse grants no automatic access to another app's data or workspaces; separation must be enforced at the storage boundary. Automatic single sign-on, shared workspace discovery, cross-app data sharing, and identity portability between backend technologies are outside v1. Future explicitly authorized cross-app sharing remains possible.
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -47,6 +48,8 @@ A user establishes an identity, resumes a session, recovers access, and links an
 2. **Given** an existing local session, **When** the app restarts, **Then** it resumes through explicit startup states without accidentally creating another identity.
 3. **Given** recovery or device linking is available, **When** the user completes the backend-native flow, **Then** they regain access to the intended identity and authorized workspaces.
 4. **Given** an interrupted or cancelled identity operation, **When** the interaction ends, **Then** transient sensitive information is cleared and the user can retry without a false success state.
+5. **Given** an identity established in one Delightful app, **When** the user explicitly connects another app using the same qualified backend, **Then** the existing identity is reused without automatically granting access to the first app's data or workspaces.
+6. **Given** two apps connected to the same identity, **When** the second app attempts direct storage access to data or workspaces authorized only for the first, **Then** the storage boundary denies access independently of UI filtering.
 
 ### User Story 3 - Work privately and collaborate with controlled access (Priority: P1)
 
@@ -109,6 +112,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - An invitation expires, is rejected, or is accepted repeatedly; outcomes must be explicit without duplicate memberships.
 - Membership changes while another device is offline. Qualification must document enforcement timing and the limits of revocation; it must not promise removal of data already disclosed.
 - Required guarantees such as atomic multi-record changes differ between backends; these differences remain visible during qualification.
+- An app reuses an identity but lacks authorization for another app's data. A backend that exposes those data through the shared identity without storage-enforced app separation must fail qualification.
 
 ## Requirements _(mandatory)_
 
@@ -125,12 +129,12 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **FR-009**: The foundation MUST provide observable startup, loading, ready, empty, and error outcomes and release obsolete observations when consumers, sessions, or workspaces change.
 - **FR-010**: The foundation MUST define a shared data interface for app-owned domain schemas, queries, subscriptions, and mutations, translated by each backend plugin. Portable consumer data code MUST NOT require backend-specific schemas or APIs. The first version MUST be limited to concrete consumer needs and validated against two real backends before the contract is stabilized; it MUST NOT promise universal backend feature parity. FR-020 defines the mandatory data baseline; FR-022 defines optional transaction capabilities.
 - **FR-011**: For operations advertised as locally durable, acknowledged changes MUST survive an offline restart. Local durability and later synchronization outcomes MUST remain distinguishable.
-- **FR-012**: Whether identities are shared between Delightful apps is [NEEDS CLARIFICATION: Q2 — choose separate app identities or shared cross-app identity, including isolation expectations; reusable account behavior does not by itself establish single sign-on].
+- **FR-012**: Users MUST be able to explicitly reuse an existing identity across Delightful apps using the same qualified backend. Identity reuse MUST NOT automatically grant access to another app's data or workspaces. App-specific access separation MUST be enforced at the backend/storage boundary, not only through UI filtering or query conventions. A plugin unable to enforce that separation MUST fail qualification. Automatic single sign-on, shared workspace discovery, cross-app data sharing, and identity portability between backend technologies are outside v1; future explicitly authorized cross-app sharing is not precluded.
 - **FR-013**: The foundation MUST offer Svelte bindings and DUI-based account/recovery, device-linking, and workspace-membership dialogs/popovers; consumer apps MUST retain ownership of full screens, routes, layouts, and domain workflows.
 - **FR-014**: Shared interactions MUST support keyboard operation, meaningful focus/dismissal behavior, consumer localization, and accessible operation feedback. Sensitive transient recovery/device information MUST be cleared when its interaction ends.
 - **FR-015**: The project MUST document recommended missing DUI primitives, informed by observed consumer needs and other local-first apps. Recommendations MUST distinguish generic presentation from foundation-owned identity/workspace behavior and MUST NOT imply implementation in this phase.
 - **FR-016**: Jazz and a real second backend MUST demonstrate the entire agreed required foundation capability set. A deterministic fake may support routine testing but MUST NOT substitute for the second real backend.
-- **FR-017**: The second backend MUST pass qualification for identity/recovery/device linking, workspace roles, extensible permissions, reactive observations, local durability, synchronization, and the data guarantees settled by Q1. DXOS is the first candidate, not a committed selection. Any deficiency MUST block qualification or prompt an explicit scope decision.
+- **FR-017**: The second backend MUST pass qualification for identity/recovery/device linking, explicit cross-app identity reuse with storage-enforced app separation, workspace roles, extensible permissions, reactive observations, local durability, synchronization, and the mandatory portable data baseline. DXOS is the first candidate, not a committed selection. Any deficiency MUST block qualification or prompt an explicit scope decision.
 - **FR-018**: A deployment MUST select its plugin explicitly. Future validation MUST run the same consumer demonstration in two separate instances with separate ports and browser storage, each configured for one backend.
 - **FR-019**: Plugin qualification MUST document offline availability, failure semantics, permission-change timing, and relevant capability limits. Other plugins need not be created or maintained by this project.
 - **FR-020**: The mandatory v1 portable data baseline MUST support typed records, explicit record-ID references, create/read/update/delete, reactive observations, equality filters, null checks, range filters, combined AND filters, field sorting, and bounded result lists. Related records MUST be accessible through separate observations; portable joins are not required. A result bound MUST NOT imply pagination support.
@@ -141,7 +145,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 
 - **Backend plugin**: Independently maintained integration with a particular local-first backend, its compatibility version, and supported capabilities.
 - **Capability requirement**: A behavior or guarantee required by a consumer; determines whether a compatible plugin is suitable for that app.
-- **Identity and session**: A backend-managed user identity and the current application's access lifecycle. Cross-app identity remains unresolved.
+- **Identity and session**: A backend-managed user identity reusable by explicit connection across apps using the same backend, with an app-specific access lifecycle. Identity reuse does not confer access to other apps' data or workspaces.
 - **Workspace**: A personal or shared boundary for protected app data, independent of Finance's financial accounts.
 - **Membership and invitation**: Granted workspace access and the process by which another identity accepts access.
 - **Permission extension**: App-specific authorization beyond baseline workspace read/write membership.
@@ -163,6 +167,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **SC-009**: The demonstration uses identical portable domain schema declarations and consumer data access code with both qualified backends for every agreed required data scenario, without per-app backend adapters for those scenarios.
 
 - **SC-010**: Every declared transaction capability passes its conformance scenarios, including failure/conflict handling and offline restart for atomic local persistence. Every scenario requiring an absent transaction capability fails qualification before dependent operations execute. Subscription visibility limits are recorded separately.
+- **SC-011**: With each qualified backend, two isolated consumer app instances can explicitly connect to the same identity while direct storage access from one app to data and workspaces authorized only for the other is denied. UI hiding or app-side filtering does not satisfy this criterion.
 
 These are future implementation acceptance criteria, not claims that this specification-only phase has exercised or satisfied them. Optional transaction capabilities are qualified separately from the mandatory baseline; an app's required capability set remains authoritative.
 
@@ -177,7 +182,7 @@ These are future implementation acceptance criteria, not claims that this specif
 - Binary-storage abstraction and app-specific file replication/download policies are deferred. This draft makes no promise of file parity.
 - Clipper starts fresh if later revived. Legacy Webnative/Fission recovery/import, Clipper restoration, and Finance migration are outside this feature.
 - This phase creates a local repository and Spec Kit specification/checklist only: no library/app code, consumer changes, tests, commits, or GitHub publishing.
-- Q1 is resolved at the requirements level: a shared portable data interface with the practical mandatory v1 baseline in FR-020 and explicit optional transaction capabilities in FR-022. Concrete interfaces and detailed conformance design belong to later design. Q2 (cross-app identity) remains unanswered and requires clarification before dependent implementation planning.
+- Q1 and Q2 are resolved at the requirements level: the practical portable data baseline and optional transaction capabilities are defined in FR-020/FR-022, and explicit identity reuse with app isolation is defined in FR-012. Concrete interfaces and conformance design belong to later design. Backend feasibility remains unverified, especially storage-enforced separation between apps sharing an identity; no backend is qualified by these decisions.
 
 ## Reference Evidence and Follow-up
 
