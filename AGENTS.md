@@ -8,6 +8,6 @@
 - Work on one task at a time and present it for review before beginning another. Change no more than one route or component per review cycle unless the user authorizes otherwise.
 - Do not use `switch` statements or `case` clauses in new application code; prefer narrowing, lookup records, or clear conditionals. Bundled Spec Kit scripts are inherited tooling.
 - Do not add or run implementation tests before the user reviews and approves the implementation they cover.
-- Use the repository Prettier configuration and avoid unrelated formatting.
+- Use the repository Oxlint and Oxfmt configurations and avoid unrelated formatting.
 - When starting a development server, tell the user and provide its URL.
 - Never commit or publish without explicit authorization.
