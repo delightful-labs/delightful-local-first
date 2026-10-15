@@ -59,8 +59,8 @@ requirement, not a reason to reject the backend. An external identity provider w
 issued app credentials is another possible architecture, but is not selected or required here.
 
 Queries, sorting, limits, and reactive data access cover much of the baseline in documentation.
-Generic null checks need verification: documented support for particular optional field types
-must not be generalized to every schema field. Local persistence and remote authorization are
+Further source inspection confirms general IsNull/IsNotNull lowering, including nullable bytes
+and arrays in upstream examples. Exact portable null/absence semantics still need design. Local persistence and remote authorization are
 separate outcomes; a locally persisted write may later be rejected, which the contract must expose.
 
 Sources: [queries](https://jazz.tools/docs/reading/queries),
@@ -138,3 +138,49 @@ state and native modal behavior; Popover wraps a native auto popover. Reuse thes
 inputs. Focus restoration, dismissal during pending operations, announcements, consumer
 localization, and sensitive-data cleanup still need interaction-specific design and validation.
 Do not label these existing primitives missing or copy them into the foundation.
+
+## Follow-up: Mandatory Data and Permission Evidence
+
+See [qualification.md](qualification.md) for the source-backed capability matrix and exact paths.
+Both backends have concrete primitives for the practical query baseline; DXOS also exposes a
+host-storage flush acknowledgement. None of these findings substitutes for restart/failure tests.
+
+The traced DXOS native peer data path admits nonremoved members to replication without reader/
+editor write differentiation, and its inbound mutation policy is permissive. Thus a READER role
+mapping alone does not meet the existing storage-enforced read-only requirement. Membership
+administration and data-write authorization must not be conflated. This is a separate limitation
+from the withdrawn cross-app isolation requirement. Requirements remain unchanged pending review
+of an evidence-backed enforcement path or an explicit scope decision.
+
+## Follow-up: Published DXOS and Alternate Enforcement
+
+The [alternate-path review](qualification.md#follow-up-alternate-dxos-enforcement-paths)
+checked the published 0.14.0 host/services source archives, legacy feed admission, and the
+Keyhive migration plan. Published code reproduces the permission limitation. Keyhive access
+control exists as separate alpha Automerge work, while DXOS's integration remains draft in
+the audited source. No supported native fix was established.
+
+Recommendation: preserve mandatory permission guarantees and design their fail-closed contract;
+retain DXOS as an unqualified candidate rather than promising native read-only support or
+implicitly expanding this project into an authorization subsystem. Full two-backend acceptance
+remains future work. This review does not change the approved spec.
+
+## Core Design Draft Following Review of the Native Limits
+
+The user authorized continuing core design with DXOS's permission limitation visible. The draft
+[data model](data-model.md), [contract](contracts/foundation.md), and [validation guide](quickstart.md)
+define required behavior without claiming that a native DXOS adapter implements it. Design
+choices such as the small scalar set, deterministic query ordering, declarative policy dialect,
+and props-based localization are proposals for this review, not executed qualification findings.
+
+This is a provisional design step; the broader backend mapping is not complete. No additional
+backend, authorization service, package versions, migration implementation, or UI primitives are
+selected by these documents. No implementation or tests were added. Two real qualifying backends
+remain required before the portable contract can be stabilized.
+
+## Contract Consistency Review
+
+[design-review.md](design-review.md) maps all functional requirements and success criteria to
+design/validation sections, distinguishes remaining research from draft coverage, and records
+corrections to permission composition, immutable scope, lifecycle commands, and unknown operation
+settlement after restart. These are documentation clarifications, not backend support findings.

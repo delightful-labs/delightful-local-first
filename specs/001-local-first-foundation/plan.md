@@ -1,8 +1,9 @@
 # Technical Plan: Pluggable Local-First App Foundation
 
-**Branch**: `001-local-first-foundation` | **Date**: 2026-10-14 | **Spec**: [spec.md](spec.md)
+**Branch**: `main` (no dedicated feature branch currently checked out) | **Date**: 2026-10-14 | **Spec**: [spec.md](spec.md)
 
-**Status**: Source-backed identity research recorded; app-isolation blocker withdrawn after user-approved requirement correction. Remaining feasibility research and Phase 1 design are pending.
+**Status**: Phase 1 core design draft prepared for review. Contracts are provisional;
+DXOS remains unqualified for read-only enforcement and full two-backend acceptance is pending.
 
 ## Summary
 
@@ -14,8 +15,9 @@ capabilities. Identity reuse follows documented backend-native authority and acc
 workspace membership and app-required domain grants remain storage-enforced.
 
 No foundation, plugin, demonstration, migration, or implementation tests are authorized in
-this phase. This plan records research and the next qualification work; it is not a completed
-implementation design. See [research.md](research.md) for evidence and blockers.
+this phase. This plan now includes a provisional core design, not an implementation-ready or
+stabilized two-backend mapping. See [research.md](research.md) and [qualification.md](qualification.md)
+for evidence and limits.
 
 ## Technical Context
 
@@ -41,16 +43,16 @@ implementation design. See [research.md](research.md) for evidence and blockers.
 
 ## Constitution Check
 
-| Gate                                                                            | Result                                                              |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Independently distributable backends, no mandatory backend dependencies in core | Required design boundary; no implementation claim                   |
-| Strict typing and explicit XState lifecycle/cleanup                             | Required; implementation checks remain pending                      |
-| Domain behavior outside foundation; DUI owns generic presentation               | Preserved                                                           |
-| Portable v1 data contract and optional transactions                             | Requirements resolved; remaining semantics need design/research     |
-| Reused identity with documented native access consequences                      | Source paths identified; no universal app-isolation gate            |
-| Workspace membership and app-required domain permissions                        | Mandatory; enforcement still requires qualification                 |
-| Two real backends meet mandatory requirements                                   | Future acceptance gate; not a prerequisite to designing conformance |
-| Specification-only scope, incremental review, approval before tests             | Satisfied by documentation-only work                                |
+| Gate                                                                            | Result                                                                                       |
+| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Independently distributable backends, no mandatory backend dependencies in core | Required design boundary; no implementation claim                                            |
+| Strict typing and explicit XState lifecycle/cleanup                             | Required; implementation checks remain pending                                               |
+| Domain behavior outside foundation; DUI owns generic presentation               | Preserved                                                                                    |
+| Portable v1 data contract and optional transactions                             | Requirements resolved; remaining semantics need design/research                              |
+| Reused identity with documented native access consequences                      | Source paths identified; no universal app-isolation gate                                     |
+| Workspace membership and app-required domain permissions                        | Mandatory; traced DXOS peer path lacks reader/editor write enforcement; see qualification.md |
+| Two real backends meet mandatory requirements                                   | Future acceptance gate; not a prerequisite to designing conformance                          |
+| Specification-only scope, incremental review, approval before tests             | Satisfied by documentation-only work                                                         |
 
 Q1/Q2 were resolved explicitly by the user; the constitution's rule to preserve them until
 resolution no longer prevents dependent research. Historical constitution references to
@@ -64,17 +66,30 @@ remains later acceptance work, not something documentation can claim to have pas
 mandatory permission or data requirement still requires another candidate or an explicit user
 scope decision, never silent weakening.
 
+The follow-up [capability evidence matrix](qualification.md) identifies native query building
+blocks for both backends and a concrete DXOS read-only-write enforcement gap. Preserve FR-007/
+FR-008 and Story 3; do not qualify a READER enum as write protection or silently make it optional.
+An alternative DXOS enforcement architecture/version or an explicit scope decision is needed
+before presenting an authorization contract as supported by both. Published runtime package
+inspection and the alternate-path review found no native fix. Core contract/conformance design
+can retain the required behavior and reject the unsupported configuration; it must not claim
+that doing so completes the two-backend acceptance criterion. No custom authorization subsystem
+is selected or authorized by the research.
+
 ## Project Structure and Boundaries
 
-Existing feature documents: specification, quality checklist, this plan, and research.
-Phase 1 would add `data-model.md`, `contracts/`, and `quickstart.md` after its entry gate passes.
-Do not create placeholder contracts or runnable commands for unimplemented software.
+Feature documents now include specification/checklist, this plan, research/capability evidence,
+[data-model.md](data-model.md), [contracts/foundation.md](contracts/foundation.md), and
+[quickstart.md](quickstart.md). The contract defines core behavior for review without claiming
+a supported DXOS mapping. The guide separates existing tooling commands from future scenarios;
+it does not invent runnable demo or conformance commands.
 
 The intended logical boundaries are backend-neutral schema/query contracts and workflow
 logic; independently distributed backend integrations; Svelte bindings; DUI presentation
 compositions; and a separately hosted consumer demonstration/conformance harness. Concrete
-package names, workspace layout, published entry points, and dependency versions are deferred
-until feasibility is established. No source directories are created by this task.
+package names, workspace layout, release entry points, and dependency versions remain release/
+implementation prerequisites. Proposed distribution units are core, Svelte bindings, DUI
+compositions, conformance checks, and separate plugins. No source directories are created.
 
 ## Phase 0: Qualification Work
 
@@ -95,7 +110,7 @@ until feasibility is established. No source directories are created by this task
 6. Review documented findings before proposing any executable spike. Such code requires a
    new implementation instruction and user review before its implementation tests.
 
-## Phase 1: Design After Gate Resolution
+## Phase 1: Core Design Draft
 
 - Define schema types, identifiers, references, validation, query comparison/order semantics,
   bounds, schema evolution, and permission policy expression using the qualified common behavior.
@@ -117,3 +132,46 @@ until feasibility is established. No source directories are created by this task
 
 No constitutional exceptions are requested. The portable abstraction is user-approved, but
 its implementation cost must not be disguised by backend-specific types leaking into consumers.
+
+## Review Decisions in This Draft
+
+- App-owned schemas use a proposed small scalar set with explicit nullability and typed references.
+  Field/patch absence, timestamp representation, query comparison/sorting, ID tie-breakers,
+  coverage, and result bounds are defined in the contract for review.
+- Plugins consume the same portable declarative access policy; arbitrary app JS predicates are
+  not enforcement. Workspace roles and domain grants remain mandatory. Native unsupported policy
+  compilation fails preflight; no DXOS enforcement subsystem is invented.
+- XState owns lifecycle and scoped operations; plugins need not use XState internally. Session/
+  workspace generations invalidate old observations, and UI cancellation does not imply rollback.
+- Local durability and later remote settlement are independent. Runtime listeners survive closed
+  forms; restart reconciliation reports unknown when native evidence is unavailable. No universal
+  operation journal is required; online status proves neither acceptance nor synchronization.
+- Pure DUI compositions receive props/callbacks and a typed message bundle built by consumer
+  Paraglide functions. The foundation does not own global locale or app routing.
+- The validation guide covers every success-criterion group, including fail-closed startup,
+  direct native authorization attempts, query parity, offline restart, optional transactions,
+  identity reuse disclosure, and accessible/localized interactions.
+
+## Post-Design Constitution Review
+
+The draft preserves independent distribution, strict TypeScript/no casts or switch in future
+code, XState workflow ownership, domain separation, reusable presentation, local durability,
+and explicit required capabilities. No new constitutional exception is requested. Q1/Q2 use
+user-approved answers. Historical constitution wording still needs its separate reconciliation.
+
+The design is reviewable but is not certified or implementation-ready. Native permission
+mapping for DXOS, release version selection, precise migration deployment, remaining recovery/
+sync semantics, and evidence-based external UI discovery must be settled in follow-up design
+before dependent implementation tasks can claim those integrations are complete. These open
+items do not erase the core behavioral contract; unsupported mappings fail qualification.
+
+After review, continue those focused design tasks one at a time. Do not generate a checklist
+that treats the remaining integration decisions as resolved, implement a backend workaround,
+install application dependencies, or run implementation tests without the required authorization.
+
+## Contract Consistency Review
+
+See [design-review.md](design-review.md) for requirement coverage, corrected lifecycle/policy
+ambiguities, and the remaining design work. The core remains a review draft, not an implemented
+library or a certified DXOS mapping. The actual current branch is main; no feature branch was
+created or checked out by this documentation review.

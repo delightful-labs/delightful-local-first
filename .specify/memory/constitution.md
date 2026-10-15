@@ -1,13 +1,15 @@
 <!-- Sync Impact Report
-Version: unadopted -> 1.0.0 (initial adoption).
-Added principles: independent backend plugins; safe, explicit TypeScript; stateful workflows;
-domain and presentation ownership; reusable accessible interactions; explicit data guarantees;
-reviewed and verified changes.
-Added sections: Technology Constraints; Development Workflow and Quality; Governance.
+Version: 1.0.0 -> 1.0.1 (editorial reconciliation of previously approved decisions).
+Modified principles: VI. Explicit Data and Access Guarantees (resolved-decision reference only).
+Modified sections: Technology Constraints; Development Workflow and Quality; Governance.
+Added sections: none.
 Removed sections: none.
-Deferred decisions: Q1 shared data abstraction and Q2 cross-app identity remain in the feature spec.
-Follow-up: configure Oxlint/Oxfmt and reconcile the Prettier instruction in AGENTS.md in a
-separately reviewed tooling task. No dependent artifacts were modified.
+Q1/Q2 are resolved in the active feature spec; no requirement is reopened or weakened.
+Oxlint/Oxfmt configuration and AGENTS.md reconciliation are complete.
+Deferred design work: application toolchain selection, exact interfaces, backend qualification,
+Svelte/type-check coverage, and UI discovery remain tracked in the feature design artifacts.
+No placeholders remain. Historical planning notes about this amendment may be refreshed in a
+later documentation task; no dependent artifacts were modified by this constitution-only task.
 This report is review scratch material and must be removed before committing the constitution.
 -->
 
@@ -76,7 +78,8 @@ Operations advertised as locally durable MUST survive an offline restart. Local 
 durability, connectivity, and synchronization MUST NOT be conflated. Consumers MUST observe distinct
 startup, loading, empty, ready, and error outcomes. Obsolete subscriptions MUST be released when
 consumers, sessions, or workspaces change and MUST NOT expose another identity's data. These rules
-constrain future design without deciding the still-open shared data boundary or cross-app identity.
+constrain implementation of the user-approved shared data boundary and identity behavior recorded
+in the active feature specification.
 
 ### VII. Reviewed and Verified Changes
 
@@ -94,13 +97,14 @@ capabilities; a deterministic fake MAY support routine tests but MUST NOT replac
 - Localization MUST use Paraglide. UI styling MUST use native CSS and CSS variables, without Tailwind.
   Until a visual direction is approved, repository-owned UI MUST remain unstyled and wireframe-like.
 - Stateful workflows MUST use XState, with Svelte integration kept outside pure presentation.
-- Oxlint and Oxfmt are the selected linting and formatting tools, replacing the Prettier policy upon
-  adoption of this constitution. Configuration and installation are deferred to a separate tooling
-  task. Preserve tabs, single quotes, no semicolons, no trailing commas, and 100-column width where
-  supported; avoid unrelated formatting.
-- Runtime and package-manager versions, package boundaries, Svelte lint/type-check coverage, and
-  detailed localization integration MUST be settled in subsequent design or tooling review before
-  dependent implementation. This constitution does not select them.
+- Use the installed Oxlint and Oxfmt tooling and repository configurations. These replace the prior
+  Prettier policy. Preserve tabs, single quotes, no semicolons, no trailing commas, and 100-column
+  width where supported; avoid unrelated formatting.
+- Repository runtime and package-manager requirements are recorded in `package.json`; the lockfile
+  pins installed tooling dependencies. Application toolchain compatibility, package boundaries,
+  Svelte lint/type-check coverage, and detailed localization integration MUST be settled through
+  design or tooling review before dependent implementation. Installed repository tooling does not
+  establish application-stack compatibility or backend qualification.
 
 ## Development Workflow and Quality
 
@@ -108,8 +112,9 @@ capabilities; a deterministic fake MAY support routine tests but MUST NOT replac
   plans, and tasks MUST remain aligned before implementation of dependent work.
 - The current phase remains specification-only. Foundation code, plugins, demonstrations, and
   consumer migrations MUST NOT be implemented without a new instruction authorizing that work.
-- Q1 (shared data abstraction) and Q2 (cross-app identity) MUST remain explicitly unanswered until
-  the user resolves them. Dependent contracts MUST NOT be designed around assumed answers.
+- Follow the user's resolved Q1 (shared data abstraction) and Q2 (cross-app identity) decisions in
+  the active feature specification. Other unanswered consequential decisions MUST remain explicit
+  until resolved; dependent contracts MUST NOT treat assumed answers as approved requirements.
 - Jazz and a second real backend MUST qualify against the agreed required capabilities. DXOS is the
   first candidate to evaluate, not a selected or presumed-compatible backend.
 - Complete one task at a time and present it for review before starting another. Change no more than
@@ -128,8 +133,8 @@ with these principles and identify unresolved decisions before dependent work be
 Amendments MUST explain their rationale and affected artifacts and be presented for user review.
 Approved amendments MUST reconcile affected specifications, plans, and repository guidance through
 explicitly scoped review tasks. Deferred reconciliation MUST be recorded rather than silently treated
-as complete. The initial adoption records tooling policy only; tooling configuration and the
-conflicting Prettier instruction in `AGENTS.md` await their separate review task.
+as complete. The initial tooling follow-up is complete: repository configuration and `AGENTS.md`
+now use Oxlint/Oxfmt. Subsequent design proposals remain subject to their own review.
 
 Constitution versions MUST follow semantic versioning: MAJOR for incompatible principle removals or
 redefinitions, MINOR for new principles or materially expanded guidance, and PATCH for clarifications
@@ -137,4 +142,4 @@ that do not change obligations. Amendments MUST preserve the original ratificati
 the last-amended date. Compliance reviews MUST check plugin independence, guarantees, ownership,
 accessibility, unresolved decisions, and the applicable review and validation gates.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-14 | **Last Amended**: 2026-10-14
+**Version**: 1.0.1 | **Ratified**: 2026-10-14 | **Last Amended**: 2026-10-14
