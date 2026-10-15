@@ -87,8 +87,8 @@ backend code lengths and formats must not be hardcoded into a universal six-digi
 | Loading/operation feedback                             | Distinguish loading, local empty, ready, errors, local durability, and remote pending/rejection/unknown; offer safe recovery                                                               | DUI renders supplied state/messages; core/plugin owns observations and settlement evidence                   |
 
 These are dialogs/popovers/embedded views, not a foundation-owned route, shell, workspace directory,
-or full account settings screen. A shown role label never certifies backend enforcement; DXOS's
-known reader-write gap remains in qualification.md even though Composer renders membership roles.
+or full account settings screen. A shown role label never certifies enforcement of an app-required
+restriction; backend-specific membership semantics remain documented in qualification.md.
 
 ## Interaction Defaults for Later Implementation Review
 

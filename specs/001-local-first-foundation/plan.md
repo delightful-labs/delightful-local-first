@@ -3,7 +3,7 @@
 **Branch**: `main` (no dedicated feature branch currently checked out) | **Date**: 2026-10-14 | **Spec**: [spec.md](spec.md)
 
 **Status**: Phase 1 core design draft prepared for review. Contracts are provisional;
-DXOS remains unqualified for read-only enforcement and full two-backend acceptance is pending.
+DXOS remains unqualified against the full mandatory capability set and two-backend acceptance is pending.
 
 ## Summary
 
@@ -50,7 +50,7 @@ for evidence and limits.
 | Domain behavior outside foundation; DUI owns generic presentation               | Preserved                                                                                    |
 | Portable v1 data contract and optional transactions                             | Requirements resolved; remaining semantics need design/research                              |
 | Reused identity with documented native access consequences                      | Source paths identified; no universal app-isolation gate                                     |
-| Workspace membership and app-required domain permissions                        | Mandatory; traced DXOS peer path lacks reader/editor write enforcement; see qualification.md |
+| Private workspace protection and app-required domain permissions               | Mandatory where required by the app; selected backend's membership model is documented    |
 | Two real backends meet mandatory requirements                                   | Future acceptance gate; not a prerequisite to designing conformance                          |
 | Specification-only scope, incremental review, approval before tests             | Satisfied by documentation-only work                                                         |
 
@@ -65,15 +65,12 @@ remains later acceptance work, not something documentation can claim to have pas
 mandatory permission or data requirement still requires another candidate or an explicit user
 scope decision, never silent weakening.
 
-The follow-up [capability evidence matrix](qualification.md) identifies native query building
-blocks for both backends and a concrete DXOS read-only-write enforcement gap. Preserve FR-007/
-FR-008 and Story 3; do not qualify a READER enum as write protection or silently make it optional.
-An alternative DXOS enforcement architecture/version or an explicit scope decision is needed
-before presenting an authorization contract as supported by both. Published runtime package
-inspection and the alternate-path review found no native fix. Core contract/conformance design
-can retain the required behavior and reject the unsupported configuration; it must not claim
-that doing so completes the two-backend acceptance criterion. No custom authorization subsystem
-is selected or authorized by the research.
+The [capability evidence matrix](qualification.md) identifies native query building blocks for both
+backends and documents DXOS's membership/access model. The spec does not require generic read-only
+membership. Private workspace protection and any app-required domain restrictions remain mandatory
+and must be supported by a selected backend; unsupported app-required restrictions fail that app's
+qualification. Do not infer enforcement from role labels or UI filtering. No custom authorization
+subsystem is selected or authorized by the research.
 
 ## Project Structure and Boundaries
 
@@ -99,8 +96,9 @@ compositions, conformance checks, and separate plugins. No source directories ar
 2. Produce a versioned evidence matrix for every mandatory capability. Separate documented
    support, source evidence, unknown behavior, and eventually executed results. Check generic
    null predicates, sorted bounded reactive results, CRUD, permissions, and offline durability.
-3. Define permission scenarios using private/shared workspaces, read-only access, and an
-   app-defined selected-record grant. Verify the restriction applies below the UI.
+3. Define permission scenarios using private/shared workspaces and app-required domain grants.
+   Verify private workspace protection and required domain restrictions at their applicable
+   enforcement boundary; document the selected backend's membership/access model.
 4. Evaluate recovery and device linking, including cancellation, credential cleanup, offline
    availability, revocation limits, and app scope. Recovery and device joining are distinct.
 5. Qualify optional transaction capabilities independently: atomic local persistence including
@@ -137,9 +135,10 @@ its implementation cost must not be disguised by backend-specific types leaking 
 - App-owned schemas use a proposed small scalar set with explicit nullability and typed references.
   Field/patch absence, timestamp representation, query comparison/sorting, ID tie-breakers,
   coverage, and result bounds are defined in the contract for review.
-- Plugins consume the same portable declarative access policy; arbitrary app JS predicates are
-  not enforcement. Workspace roles and domain grants remain mandatory. Native unsupported policy
-  compilation fails preflight; no DXOS enforcement subsystem is invented.
+- Plugins consume the same portable declarative access policy for app-required domain restrictions;
+  arbitrary app JS predicates are not enforcement. Private workspace protection and required domain
+  grants remain mandatory. Membership role details follow the selected backend. Unsupported required
+  policy compilation fails preflight; no DXOS enforcement subsystem is invented.
 - XState owns lifecycle and scoped operations; plugins need not use XState internally. Session/
   workspace generations invalidate old observations, and UI cancellation does not imply rollback.
 - Local durability and later remote settlement are independent. Runtime listeners survive closed
@@ -148,21 +147,22 @@ its implementation cost must not be disguised by backend-specific types leaking 
 - Pure DUI compositions receive props/callbacks and a typed message bundle built by consumer
   Paraglide functions. The foundation does not own global locale or app routing.
 - The validation guide covers every success-criterion group, including fail-closed startup,
-  direct native authorization attempts, query parity, offline restart, optional transactions,
-  identity reuse disclosure, and accessible/localized interactions.
+  private workspace and app-required authorization scenarios, query parity, offline restart,
+  optional transactions, identity reuse disclosure, and accessible/localized interactions.
 
 ## Post-Design Constitution Review
 
 The draft preserves independent distribution, strict TypeScript/no casts or switch in future
 code, XState workflow ownership, domain separation, reusable presentation, local durability,
-and explicit required capabilities. No new constitutional exception is requested. Q1/Q2 use
+private workspace protection, app-required permissions, and explicit capabilities. No new
+constitutional exception is requested. Q1/Q2 use
 user-approved answers. Constitution v1.0.1 reconciles the historical wording about decisions and tooling.
 
-The design is reviewable but is not certified or implementation-ready. Native permission
-mapping for DXOS, release version selection, precise migration deployment, and remaining recovery/
-sync semantics must be settled in follow-up design
-before dependent implementation tasks can claim those integrations are complete. These open
-items do not erase the core behavioral contract; unsupported mappings fail qualification.
+The design is reviewable but is not certified or implementation-ready. Mapping private workspace
+protection and app-required restrictions to DXOS, release version selection, precise migration
+deployment, and remaining recovery/sync semantics must be settled in follow-up design before
+dependent implementation tasks can claim those integrations are complete. These open items do not
+erase the core behavioral contract; unsupported required mappings fail qualification.
 
 After review, continue those focused design tasks one at a time. Do not generate a checklist
 that treats the remaining integration decisions as resolved, implement a backend workaround,

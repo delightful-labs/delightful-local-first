@@ -69,10 +69,11 @@ decision, not a requirement for consumers to adopt foundation-owned routing.
 
 ### VI. Explicit Data and Access Guarantees
 
-Permissions MUST be enforced at the backend/storage boundary, independently of UI visibility.
-Personal workspaces MUST protect private data, and shared workspaces MUST enforce explicit read/write
-membership and app-required restrictions. Qualification MUST document offline availability,
-permission-change timing, revocation limits, failure semantics, and relevant capability limits.
+Permissions MUST be enforced at the backend/storage boundary, independently of UI visibility, for
+private workspaces and app-required restrictions. Shared workspace membership and available access
+levels MUST follow the selected backend's documented model; the foundation does not require generic
+read-only membership. Qualification MUST document offline availability, permission-change timing,
+revocation limits, failure semantics, and relevant capability limits.
 
 Operations advertised as locally durable MUST survive an offline restart. Local acceptance,
 durability, connectivity, and synchronization MUST NOT be conflated. Consumers MUST observe distinct

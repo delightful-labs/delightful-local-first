@@ -53,19 +53,18 @@ A user establishes an identity, resumes a session, recovers access, and links an
 
 ### User Story 3 - Work privately and collaborate with controlled access (Priority: P1)
 
-A user has a private personal workspace and can create or join shared workspaces with explicit read/write membership. An app developer can add domain-specific restrictions, such as Finance's selected-ledger access.
+A user has a private personal workspace and can create or join shared workspaces. An app developer can add domain-specific restrictions, such as Finance's selected-ledger access.
 
 **Why this priority**: Sharing and app-specific authorization must remain meaningful across plugins.
 
-**Independent Test**: Use separate identities to demonstrate private isolation, an invitation, read-only membership, write membership, and an app-defined restriction at the storage boundary.
+**Independent Test**: Use separate identities to demonstrate private isolation, an invitation, shared workspace access, and an app-defined restriction at the storage boundary.
 
 **Acceptance Scenarios**:
 
 1. **Given** a personal workspace, **When** an unrelated identity attempts access, **Then** it cannot read or write its protected data.
 2. **Given** a shared workspace invitation, **When** the intended recipient accepts it, **Then** they receive only the access granted by the workspace's membership policy.
-3. **Given** read-only membership, **When** the user attempts a write directly through data access, **Then** the storage boundary rejects it.
-4. **Given** an app-specific permission extension, **When** a user attempts an operation outside their grant, **Then** the plugin enforces the restriction independently of UI visibility.
-5. **Given** a backend cannot enforce the app's required restrictions, **When** it is qualified for that app, **Then** qualification fails with the unsupported requirement identified.
+3. **Given** an app-specific permission extension, **When** a user attempts an operation outside their grant, **Then** the plugin enforces the restriction independently of UI visibility.
+4. **Given** a backend cannot enforce an app's required domain restriction, **When** it is qualified for that app, **Then** qualification fails with the unsupported requirement identified.
 
 ### User Story 4 - Observe local data and operation states (Priority: P2)
 
@@ -105,14 +104,14 @@ An app developer composes account/recovery, device-linking, and workspace-member
 
 - Backend startup fails, is cancelled, or is requested more than once.
 - Contract versions are incompatible or declared capabilities fail conformance checks.
-- A plugin supports workspace roles but cannot enforce an app-specific restriction.
+- A plugin supports membership administration but cannot enforce an app-specific restriction.
 - A session/workspace changes while an observation or identity operation is pending.
 - The device is offline during identity establishment, recovery, or invitation acceptance; unsupported offline operations must not report success.
 - A local write fails before durability, or synchronization fails after local durability.
 - An invitation expires, is rejected, or is accepted repeatedly; outcomes must be explicit without duplicate memberships.
 - Membership changes while another device is offline. Qualification must document enforcement timing and the limits of revocation; it must not promise removal of data already disclosed.
 - Required guarantees such as atomic multi-record changes differ between backends; these differences remain visible during qualification.
-- Connecting another app may grant authority over spaces already accessible to the reused identity. The interaction must explain this consequence; app tags, separate views, and browser storage must not be presented as security isolation. Unauthorized identities and operations outside required membership/grants must still be denied.
+- Connecting another app may grant authority over spaces already accessible to the reused identity. The interaction must explain this consequence; app tags, separate views, and browser storage must not be presented as security isolation. Unauthorized identities and operations outside required membership or app-required domain grants must still be denied.
 
 ## Requirements _(mandatory)_
 
@@ -124,17 +123,17 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **FR-004**: The foundation MUST validate compatibility and app-required capabilities before permitting dependent operations. Missing capabilities MUST NOT silently weaken authorization, durability, or other declared guarantees.
 - **FR-005**: Plugin authors MUST have reusable conformance checks that distinguish contract compliance from qualification against an app's required capability set.
 - **FR-006**: The foundation MUST expose identity establishment, session lifecycle, recovery, and device-linking outcomes while permitting backend-native methods and steps.
-- **FR-007**: The foundation MUST support private personal workspaces and invited shared workspaces with explicit read/write membership.
-- **FR-008**: App developers MUST be able to extend authorization with domain-specific restrictions enforced at the backend/storage boundary. UI filtering alone MUST NOT qualify as enforcement.
+- **FR-007**: The foundation MUST support private personal workspaces and invited shared workspaces with explicit membership and access controlled by the selected backend's supported model.
+- **FR-008**: App developers MUST be able to declare domain-specific restrictions required by their app. Where an app requires a restriction to be enforced at the backend/storage boundary, UI filtering alone MUST NOT qualify as enforcement, and a backend that cannot enforce it MUST fail qualification for that app. The foundation does not require a generic read-only membership capability.
 - **FR-009**: The foundation MUST provide observable startup, loading, ready, empty, and error outcomes and release obsolete observations when consumers, sessions, or workspaces change.
 - **FR-010**: The foundation MUST define a shared data interface for app-owned domain schemas, queries, subscriptions, and mutations, translated by each backend plugin. Portable consumer data code MUST NOT require backend-specific schemas or APIs. The first version MUST be limited to concrete consumer needs and validated against two real backends before the contract is stabilized; it MUST NOT promise universal backend feature parity. FR-020 defines the mandatory data baseline; FR-022 defines optional transaction capabilities.
 - **FR-011**: For operations advertised as locally durable, acknowledged changes MUST survive an offline restart. Local durability and later synchronization outcomes MUST remain distinguishable.
-- **FR-012**: Users MUST be able to explicitly reuse an existing identity across Delightful apps using the same qualified backend, with backend-native access behavior. Plugins MUST document identity versus app-account mapping, credential authority, workspace discovery, and data access granted by reuse; the connection interaction MUST explain those consequences. Apps sharing identity authority are not required to be security-isolated from one another. App-owned schemas/workspaces MUST keep domain data organized, without presenting that organization as an authorization boundary. Private workspaces, membership roles, and app-required domain permission restrictions MUST remain enforced at the storage boundary. Foundation-provided automatic single sign-on, a shared workspace directory, cross-app data integration, and identity portability between backend technologies are outside v1; backend-native discovery/access and future explicitly authorized integrations are not precluded.
+- **FR-012**: Users MUST be able to explicitly reuse an existing identity across Delightful apps using the same qualified backend, with backend-native access behavior. Plugins MUST document identity versus app-account mapping, credential authority, workspace discovery, and data access granted by reuse; the connection interaction MUST explain those consequences. Apps sharing identity authority are not required to be security-isolated from one another. App-owned schemas/workspaces MUST keep domain data organized, without presenting that organization as an authorization boundary. Private workspaces and app-required domain permission restrictions MUST remain enforced at the storage boundary where required by the app. Cross-app identity reuse does not itself promise app isolation. Foundation-provided automatic single sign-on, a shared workspace directory, cross-app data integration, and identity portability between backend technologies are outside v1; backend-native discovery/access and future explicitly authorized integrations are not precluded.
 - **FR-013**: The foundation MUST offer Svelte bindings and DUI-based account/recovery, device-linking, and workspace-membership dialogs/popovers; consumer apps MUST retain ownership of full screens, routes, layouts, and domain workflows.
 - **FR-014**: Shared interactions MUST support keyboard operation, meaningful focus/dismissal behavior, consumer localization, and accessible operation feedback. Sensitive transient recovery/device information MUST be cleared when its interaction ends.
 - **FR-015**: The project MUST document recommended missing DUI primitives, informed by observed consumer needs and other local-first apps. Recommendations MUST distinguish generic presentation from foundation-owned identity/workspace behavior and MUST NOT imply implementation in this phase.
 - **FR-016**: Jazz and a real second backend MUST demonstrate the entire agreed required foundation capability set. A deterministic fake may support routine testing but MUST NOT substitute for the second real backend.
-- **FR-017**: The second backend MUST pass qualification for identity/recovery/device linking, explicit cross-app identity reuse with documented backend-native access consequences, workspace roles, extensible permissions, reactive observations, local durability, synchronization, and the mandatory portable data baseline. DXOS is the first candidate, not a committed selection. Any deficiency MUST block qualification or prompt an explicit scope decision.
+- **FR-017**: The second backend MUST pass qualification for identity/recovery/device linking, explicit cross-app identity reuse with documented backend-native access consequences, private/shared workspace behavior, app-required domain restrictions, reactive observations, local durability, synchronization, and the mandatory portable data baseline. DXOS is the first candidate, not a committed selection. Any deficiency against a mandatory foundation or app-required capability MUST block qualification or prompt an explicit scope decision.
 - **FR-018**: A deployment MUST select its plugin explicitly. Future validation MUST run the same consumer demonstration in two separate instances with separate ports and browser storage, each configured for one backend.
 - **FR-019**: Plugin qualification MUST document offline availability, failure semantics, permission-change timing, and relevant capability limits. Other plugins need not be created or maintained by this project.
 - **FR-020**: The mandatory v1 portable data baseline MUST support typed records, explicit record-ID references, create/read/update/delete, reactive observations, equality filters, null checks, range filters, combined AND filters, field sorting, and bounded result lists. Related records MUST be accessible through separate observations; portable joins are not required. A result bound MUST NOT imply pagination support.
@@ -148,7 +147,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **Identity and session**: A backend-managed user identity reusable by explicit connection across apps using the same backend, with backend-native credential authority and workspace access. A backend may assign separate app accounts to one identity; shared authority does not imply security isolation between apps.
 - **Workspace**: A personal or shared boundary for protected app data, independent of Finance's financial accounts.
 - **Membership and invitation**: Granted workspace access and the process by which another identity accepts access.
-- **Permission extension**: App-specific authorization beyond baseline workspace read/write membership.
+- **Permission extension**: App-specific authorization restrictions that a consumer requires beyond the selected backend's baseline workspace behavior.
 - **Portable domain schema and data operation**: An app-owned typed record model with explicit record-ID references, and its baseline queries, subscriptions, and mutations expressed through the foundation's shared interface and translated by plugins; multi-record transactions are separately declared optional capabilities.
 - **Observation and operation outcome**: Consumer-visible data readiness, errors, durability, and synchronization information across qualified backend implementations.
 
@@ -160,7 +159,7 @@ An app developer composes account/recovery, device-linking, and workspace-member
 - **SC-002**: Two real backends pass every scenario for the agreed mandatory foundation capabilities; differences and optional capabilities are explicitly recorded.
 - **SC-003**: Every incompatible version or missing app-required capability in the qualification scenarios produces an actionable failure before the unsupported operation executes.
 - **SC-004**: Identity creation/resumption, recovery, and linking a second device succeed through both qualified backends, with cancellation and failure cases producing no false success.
-- **SC-005**: All private-workspace, read-only-write, and app-specific permission denial scenarios are enforced through direct data access as well as through the UI.
+- **SC-005**: Unauthorized identities and operations outside an app's required domain grants are denied at the storage boundary in every qualified scenario; no generic read-only membership behavior is assumed.
 - **SC-006**: Every write acknowledged as locally durable in the qualification scenarios remains available after an offline restart.
 - **SC-007**: Consumers distinguish loading, empty, ready, and error results; disposed observations produce no further consumer updates.
 - **SC-008**: All required shared interactions can be embedded without adopting a foundation-owned screen or router and can be completed with keyboard input.
@@ -187,6 +186,6 @@ These are future implementation acceptance criteria, not claims that this specif
 ## Reference Evidence and Follow-up
 
 - Finance's `jazz-session.ts`, `WorkspaceBootstrap.svelte`, `QueryContent.svelte`, identity schema, and permissions provide extraction evidence; reuse patterns, not finance-specific assumptions.
-- Clipper's legacy Webnative integration couples identity, metadata, and file storage. It motivates replaceability without bringing binary storage or reader features into this spec.
+- Clipper's legacy Webnative integration couples identity, metadata, and file storage. It motivates replaceability without bringing binary storage or unrelated access-control assumptions into this spec.
 - [Backend source investigation](research.md) records pinned Jazz and DXOS identity/access findings. DXOS remains the first second-backend candidate; neither source analysis nor documentation review constitutes full qualification.
 - Later UI discovery should review account recovery, device linking, collaboration, and loading behavior in local-first apps, including DXOS Composer. Recommendations must cite the observed behavior and state whether it belongs in DUI or this foundation; that discovery is not an app implementation commitment.

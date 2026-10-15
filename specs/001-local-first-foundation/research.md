@@ -121,9 +121,10 @@ credential scope, space discovery, and access when connecting a second app. Chec
 connection interaction explains the consequences before explicit connection. Shared root or
 device authority is permitted; no universal denial between those apps is required.
 
-Continue qualifying direct access denial for unauthorized identities, read-only writes, and
+Continue qualifying private workspace protection and direct denial of operations outside
 app-required domain grants. Do not substitute tags, filtered queries, or hidden controls for
-required permission enforcement. Recovery/device linking, generic null/range/AND filtering,
+required permission enforcement. Document backend-defined membership/access levels without
+assuming a generic read-only role. Recovery/device linking, generic null/range/AND filtering,
 sorted bounded reactive results, local durability, later rejection, and optional transaction
 semantics still require further evidence and eventually executable qualification.
 
@@ -145,12 +146,11 @@ See [qualification.md](qualification.md) for the source-backed capability matrix
 Both backends have concrete primitives for the practical query baseline; DXOS also exposes a
 host-storage flush acknowledgement. None of these findings substitutes for restart/failure tests.
 
-The traced DXOS native peer data path admits nonremoved members to replication without reader/
-editor write differentiation, and its inbound mutation policy is permissive. Thus a READER role
-mapping alone does not meet the existing storage-enforced read-only requirement. Membership
-administration and data-write authorization must not be conflated. This is a separate limitation
-from the withdrawn cross-app isolation requirement. Requirements remain unchanged pending review
-of an evidence-backed enforcement path or an explicit scope decision.
+The traced DXOS native peer data path admits nonremoved members to replication and its inbound
+mutation policy is permissive. This is recorded as a backend access-model limitation, not a
+failure against a generic read-only membership requirement, which the user has removed. Private
+workspace protection and app-required domain restrictions remain requirements and must be
+qualified independently; membership administration and domain authorization must not be conflated.
 
 ## Follow-up: Published DXOS and Alternate Enforcement
 
@@ -160,10 +160,10 @@ Keyhive migration plan. Published code reproduces the permission limitation. Key
 control exists as separate alpha Automerge work, while DXOS's integration remains draft in
 the audited source. No supported native fix was established.
 
-Recommendation: preserve mandatory permission guarantees and design their fail-closed contract;
-retain DXOS as an unqualified candidate rather than promising native read-only support or
-implicitly expanding this project into an authorization subsystem. Full two-backend acceptance
-remains future work. This review does not change the approved spec.
+Recommendation: preserve private workspace protection and app-required domain restrictions;
+retain DXOS as an unqualified candidate until those mandatory behaviors are validated. Do not
+claim generic read-only membership support or implicitly expand this project into an authorization
+subsystem. Full two-backend acceptance remains future work.
 
 ## Core Design Draft Following Review of the Native Limits
 

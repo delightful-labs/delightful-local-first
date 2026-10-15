@@ -26,17 +26,18 @@ Domain references identify a declared collection and record ID; they are not nat
 | App account            | account ID, identity ID, app ID                                                               | Jazz's separate app accounts fit here; no assumption that DXOS requires separate account IDs |
 | Session                | session ID, identity, optional native app account, generation, lifecycle state                | Generation invalidates pending work and observations after identity changes                  |
 | Workspace              | workspace ID, personal/shared kind, display name                                              | Protected logical scope; a plugin may map it to multiple native spaces if guarantees hold    |
-| Membership             | membership ID, workspace ID, identity ID, data access read/write, management authority        | Management authority is distinct from data access; native owner/admin labels map explicitly  |
+| Membership             | membership ID, workspace ID, identity ID, backend-defined access, management authority        | Management authority is distinct from data access; native owner/admin labels map explicitly  |
 | Invitation             | invitation ID, workspace ID, granted access, intended-recipient constraints, lifecycle        | Tokens and pairing material are transient secrets, not ordinary entity fields                |
 | Domain record          | immutable record ID/workspace ID, declared app fields                                         | Workspace binding is enforced; changes cannot escape scope by changing a field               |
 | Permission declaration | stable policy ID/version, protected collection, allowed operations, expression                | App-owned domain restriction compiled/enforced by plugin; never an arbitrary UI predicate    |
 | Observation            | observation ID, session/workspace generation, query, readiness, coverage                      | Runtime-owned, not app persistence; disposal terminates delivery                             |
 | Operation              | operation ID, owner scope, local persistence state, remote settlement, error                  | Tracks later rejection separately from initial persistence                                   |
 
-The minimum data membership roles are reader and writer. Ownership/admin authority for creating
-invitations or changing membership must be mapped and documented by the plugin; being a writer
-does not automatically grant membership-management authority. Granting private personal access
-must be idempotent on resumption; do not create another identity or workspace on transient failure.
+Workspace access levels and membership roles follow the selected backend's supported model and
+must be documented by its plugin. Ownership/admin authority for creating invitations or changing
+membership is distinct from data access and must be mapped explicitly. The foundation does not
+require a generic reader/writer role pair. Granting private personal access must be idempotent on
+resumption; do not create another identity or workspace on transient failure.
 
 ## Portable Domain Fields
 

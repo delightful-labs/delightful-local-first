@@ -7,7 +7,7 @@ backend certification. The current branch is `main`; this review creates no bran
 
 | Finding                                                                       | Correction                                                                                                       | Why it matters                                                                                     |
 | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| App policy composition could be interpreted as replacing workspace membership | Effective permission is baseline membership AND app policy; default-deny operations, protected membership/grants | A permissive domain rule cannot authorize a nonmember, promote a reader, or permit self-granting   |
+| App policy composition could be interpreted as replacing workspace membership | Effective permission is baseline membership AND app policy; default-deny operations, protected membership/grants | A permissive domain rule cannot authorize a nonmember or permit self-granting   |
 | Updating a record's workspace was underspecified                              | Record ID and workspace binding are immutable; scope changes require new handles                                 | Updates cannot move protected data across a workspace boundary                                     |
 | Close, logout, and cancellation were conflated                                | Defined separate outcomes, credential retention disclosure, stale-handle rejection, and retryable failed close   | Closing a tab is not global logout; cancelled UI does not undo committed authority or writes       |
 | Operation recovery could imply a new universal durable event journal          | Active runtime retains rejection listeners; restart reconciliation uses native evidence or unknown               | Avoids false acceptance and accidental duplicate retries without inventing an unapproved subsystem |
@@ -15,8 +15,8 @@ backend certification. The current branch is `main`; this review creates no bran
 | Plan header named a feature branch that is not checked out                    | Corrected the current branch to main                                                                             | Documentation no longer implies branch setup occurred                                              |
 
 The contract remains a proposed review draft. These corrections clarify the current requirements;
-they do not make the native DXOS peer path enforce read-only writes or change the approved
-identity-reuse decision.
+they do not establish enforcement of app-required domain restrictions on the native DXOS peer path
+or change the approved identity-reuse decision.
 
 ## Requirement-to-Design Map
 
@@ -27,7 +27,7 @@ identity-reuse decision.
 | FR-001, FR-002                 | Contract: Package and Dependency Boundaries                                                  | Separate distribution/core dependencies covered; publication names deferred                                                        |
 | FR-003, FR-004, FR-005         | Contract: Registration, Compatibility, and Capability Checks; quickstart reporting           | Version/capability/preflight behavior covered; executable conformance absent                                                       |
 | FR-006, FR-012                 | Contract: Conceptual Public Surface; Errors, XState, and Presentation; data model identities | Lifecycle/native authority disclosure covered; concrete native steps still need mapping                                            |
-| FR-007, FR-008                 | Contract: Portable Authorization Declarations; data model memberships                        | Required access model covered; exact policy grammar/compiler design and DXOS enforcement unresolved                                |
+| FR-007, FR-008                 | Contract: Portable Authorization Declarations; data model memberships                        | Private workspace and app-required restriction model covered; exact policy grammar/compiler design and DXOS enforcement unresolved                                |
 | FR-009, FR-010, FR-020         | Contract: Portable Query Semantics; data model fields                                        | Practical baseline and cleanup covered; exact typed signatures/adapters and comparison qualification pending                       |
 | FR-011                         | Contract: Operations, Durability, and Transactions; quickstart persistence scenarios         | Local/remote outcomes covered; native crash/restart behavior untested                                                              |
 | FR-013, FR-014                 | Contract: Errors, XState, and Presentation; quickstart interaction scenarios                 | Props/message-bundle boundary, focus/dismissal, secret cleanup covered; no UI built                                                |
@@ -40,7 +40,7 @@ checklist into an implementation-readiness or qualification certificate.
 
 Success-criterion coverage is likewise planned: SC-001/SC-003 preflight/independent integration;
 SC-002/SC-009 two real backends with identical portable declarations; SC-004 native identity
-flows; SC-005 direct authorization attempts; SC-006 offline durable restart; SC-007 readiness/
+flows; SC-005 private workspace and app-required authorization attempts; SC-006 offline durable restart; SC-007 readiness/
 disposal; SC-008 keyboard-usable embedded compositions; SC-010 optional transaction qualification;
 SC-011 identity reuse with disclosed native access. None has been executed by this review.
 
@@ -56,9 +56,9 @@ feedback and proposed optional copy/QR primitives. Neither follow-up establishes
 2. Pin the implementation toolchain/native SDK-server combinations and document their deployment,
    migration, recovery/device flow, synchronization, and diagnostic-retention behavior. Root
    tooling versions do not imply application dependency compatibility.
-3. Establish a second qualifying backend/enforcement path before claiming cross-backend acceptance.
-   Keep the source-backed DXOS reader-write limitation visible; a replacement backend, weakened
-   requirement, or custom authorization subsystem needs an explicit scope decision.
+3. Establish two backends that qualify for the mandatory foundation behaviors before claiming
+   cross-backend acceptance. Keep source-backed DXOS access-model limits visible when assessing
+   app-required policies; a replacement backend or custom authorization subsystem needs explicit review.
 
 Core design can continue with required behavior and fail-closed unsupported configurations.
 Backend-specific implementation tasks must not claim the above choices/mappings are settled.

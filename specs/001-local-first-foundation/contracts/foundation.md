@@ -2,8 +2,8 @@
 
 **Status**: Proposed behavioral/interface design for review. No package or API is implemented.
 The draft is not stabilized until two real backends satisfy the agreed mandatory scenarios.
-[DXOS's current read-only limitation](../qualification.md) remains a qualification failure;
-this document does not turn that capability optional or supply an authorization subsystem.
+[DXOS's documented membership/access model](../qualification.md) remains under qualification;
+app-required domain restrictions must not be claimed without evidence of enforcement.
 
 ## Package and Dependency Boundaries
 
@@ -34,7 +34,7 @@ unknown metadata does not authorize an operation. Capabilities describe guarante
 Mandatory baseline groups:
 
 - Identity creation/resumption, recovery, second-device access, and explicit same-backend reuse.
-- Private/shared workspaces, invitations, storage-enforced read/write roles and app policies.
+- Private/shared workspaces, invitations, backend-defined membership/access, and app-required policies.
 - Portable schemas/CRUD/query observations and confirmed local persistence.
 - Explicit lifecycle cleanup, actionable errors, and documented sync/access semantics.
 
@@ -44,9 +44,9 @@ App-required capabilities augment the baseline; they cannot subtract permissions
 A declaration is not certification: conformance reports separately identify compatibility,
 baseline compliance, app qualification, source evidence, and executed results.
 
-A plugin unable to enforce a policy dialect must fail preflight before dependent operations.
-In particular, the audited native DXOS path must report the missing read-only enforcement and
-cannot reach an app-ready state for this baseline merely by wrapping its mutation functions.
+A plugin unable to enforce an app-required policy dialect must fail preflight before dependent
+operations. A foundation-side check on its own mutation functions does not establish storage-boundary
+enforcement against direct native access.
 
 ## Conceptual Public Surface
 
@@ -176,18 +176,19 @@ possibly committed mutation automatically.
 
 ## Portable Authorization Declarations
 
-Workspace membership is the baseline: nonmembers are denied, readers cannot persist authorized
-shared changes, and writers receive only permitted operations. Membership-management authority
-is checked separately. Native optimistic local state may precede final authority rejection;
+Workspace membership is the baseline: nonmembers are denied, and access for members follows the
+selected backend's documented model. Membership-management authority is checked separately. Any
+app-required domain restriction is enforced at the backend/storage boundary, not only by UI or
+foundation-side filtering. Native optimistic local state may precede final authority rejection;
 this cannot be reported as final authorization or accepted by other authorized replicas as a
-legitimate write. Qualification records the rejection point and timing, including offline limits.
+legitimate write. Qualification records the enforcement point and timing, including offline limits.
 
-Authorization is default-deny per operation. The effective grant is baseline workspace
+Authorization is default-deny per protected operation. The effective grant is baseline workspace
 membership **AND** the app's applicable policy; OR branches inside an app policy never bypass
-membership or elevate a reader to writer. The plugin's trusted membership source is not an
-app-writable grant table. Absence of a required grant denies access; the app cannot authorize
-an operation by omitting its policy declaration. Collections without extra domain restrictions
-must declare use of the baseline policy explicitly.
+membership. The plugin's trusted membership source is not an app-writable grant table. Absence of
+a required grant denies access; the app cannot authorize an operation by omitting its policy
+declaration. Collections without extra domain restrictions must declare use of the backend's
+baseline workspace policy explicitly.
 
 Apps declare additional policies in a small typed, declarative policy tree attached to each
 collection/operation. The proposed first dialect supports comparisons between declared record
@@ -209,7 +210,8 @@ policy ID and reason; it must not ignore clauses or accept a JS predicate instea
 
 The dialect is a proposed minimum to model concrete consumer grants, not an implemented universal
 policy engine. A backend may map logical workspaces to multiple native spaces, but must preserve
-all required access rules. Partitioning read access alone does not supply reader/write separation.
+private workspace protection and each app-required access rule. Backend-specific membership levels
+are not normalized into a mandatory reader/writer distinction.
 
 ## Operations, Durability, and Transactions
 
@@ -239,7 +241,7 @@ work; the owning runtime must retain/reconcile it or report inability to close s
 `transactions.localAtomic` requires all-or-none persisted group state across local failure and
 offline restart. `transactions.authorityValidated` requires authoritative conflict validation of
 related reads/writes before acceptance; authority unavailability is pending or failure. Both
-require declared read/write scope and separate documentation of local/remote subscription visibility.
+require declared operation scope and separate documentation of local/remote subscription visibility.
 Business invariants under concurrent offline changes are not inferred from grouped local writes.
 Unsupported transaction requests fail before starting any group member.
 

@@ -1,8 +1,9 @@
 # Backend Capability Evidence and Design Implications
 
 **Status**: Source review for design; no backend is runtime-qualified.
-**Scope**: Existing mandatory requirements are unchanged. This document does not select a
-replacement backend, add a service, or make read-only membership optional.
+**Scope**: This document records source evidence against the active requirements. It does not
+select a replacement backend or add a service. Generic read-only membership is not a foundation
+requirement.
 
 ## Evidence Revisions
 
@@ -48,7 +49,7 @@ Native query primitives make the practical baseline plausible for both backends.
 precision, string collation, absent/null normalization, observation ordering, and crash behavior
 are still design/conformance work. Do not claim parity merely because operator names match.
 
-## Authorization: Distinguish Membership Administration from Record Writes
+## Authorization: Backend Membership Models and App-Required Restrictions
 
 Jazz provides row policies for reads/inserts/updates/deletes, including correlated grants and
 old/new-row checks. Finance's selected-account policies provide concrete reference consumer
@@ -62,11 +63,13 @@ Sources: [permission model](https://jazz.tools/docs/auth/permissions),
 These documentation links complement the pinned source; they do not establish compatibility
 with every published Jazz alpha.
 
-DXOS's current traced native ECHO peer path does not implement the required reader/editor write
-separation. Evidence is in the actual authorization flow, not the absence of a tutorial:
+DXOS's current traced native ECHO peer path admits nonremoved members to replication without a
+reader/editor write distinction. This describes the backend's access model; a generic read-only
+membership guarantee is not required by the active spec. Evidence is in the actual authorization
+flow, not the absence of a tutorial:
 
 1. Production service wiring supplies mesh replication unless P2P replication is disabled.
-2. A space trusts every nonremoved member identity, including a READER.
+2. A space trusts every nonremoved member identity, including members labelled READER.
 3. Successful peer authentication authorizes that device for the space's replication.
 4. The mesh authorization set records space and device, with no read/write role distinction.
 5. The host explicitly says classical sync has no inbound gate, and Subduction authorizePut
@@ -78,24 +81,24 @@ Sources: [production wiring](https://github.com/dxos/dxos/blob/0d811677577e239ae
 [mesh sharing and authorization](https://github.com/dxos/dxos/blob/0d811677577e239ae9a0f8b6ab035cb9c986835b/packages/core/echo/echo-host/src/automerge/mesh-echo-replicator.ts#L145),
 [inbound policy](https://github.com/dxos/dxos/blob/0d811677577e239ae9a0f8b6ab035cb9c986835b/packages/core/echo/echo-host/src/automerge/automerge-host.ts#L1166).
 
-Conclusion: the inspected native replication path cannot currently be mapped to FR-007/FR-008
-and Story 3's direct read-only-write denial merely by mapping the READER enum. This is a
-source-level incompatibility in that path, not an executed exploit result or a claim that no
-possible DXOS-based architecture could enforce the requirement.
+Conclusion: the inspected native replication path has no reader/editor write distinction. That is
+not by itself a failure against the active requirements. It remains relevant when assessing an
+app-specific restriction: a foundation adapter wrapping only its own mutation functions does not
+establish enforcement against direct native access. This is source-level analysis, not an executed
+exploit result or a claim that no possible DXOS-based architecture could enforce a required policy.
 
-Space partitioning can potentially express selected read grants by placing protected subsets
-in separate spaces. It does not solve reader-versus-editor writes within one shared space.
-A foundation adapter that only checks its own mutation calls would leave direct native access
-unrestricted and does not satisfy the current spec. A custom lower-level enforcement mechanism
-or another version/replication path would require explicit architecture review and qualification;
-neither is assumed to exist or silently added by this document.
+Space partitioning can potentially express access to selected subsets by placing protected data
+in separate spaces. A foundation adapter that only checks its own mutation calls does not establish
+enforcement against direct native access for any app-required restriction. A custom lower-level
+enforcement mechanism or another version/replication path would require explicit architecture
+review and qualification; neither is assumed to exist or silently added by this document.
 
 ## Identity, Recovery, and Optional Transactions
 
 Native identity-reuse findings remain as documented in [research.md](research.md): separate app
 accounts for Jazz; shared identity/space authority for DXOS. That earlier app-isolation issue
-is not reopened by this permission finding. Cross-app authority and workspace read-only roles
-are different requirements.
+is not reopened by this access-model evidence. Cross-app authority and backend-specific membership
+semantics are separate concerns.
 
 Jazz source/docs support recovery-root export/restore and passkey backup; these can inform a
 second-device flow without claiming independently revocable per-device credentials. DXOS HALO
@@ -109,14 +112,11 @@ Do not advertise those capabilities until separately qualified.
 
 ## Review Outcome and Next Work
 
-The portable query baseline has concrete native building blocks in both codebases. A common
-contract can be drafted provisionally, but the whole mandatory plugin contract cannot be
-presented as natively supported by both while the DXOS read-only gap remains.
-
-Before finalizing the authorization contract, decide an evidence-backed route: identify a DXOS
-version or enforcement path that meets the existing requirement; explicitly scope an additional
-backend enforcement design; or obtain a deliberate user requirement change. Making read-only
-optional or selecting another backend is a scope decision, not an automatic fallback.
+The portable query baseline has concrete native building blocks in both codebases. The DXOS
+reader/editor write distinction is not a mandatory foundation capability. Private workspace
+protection and any app-required domain restrictions still need evidence-backed qualification.
+If DXOS cannot enforce a restriction required by a particular app, that app/backend combination
+must not qualify unless an enforcement architecture is explicitly reviewed and validated.
 
 Continue design only with the limitation visible. No foundation/plugin code, implementation
 tests, service, backend replacement, or requirement amendment is authorized by this source audit.
@@ -182,12 +182,11 @@ Source: [Automerge's alpha integration guide](https://automerge.org/docs/keyhive
 
 ### Recommended planning treatment
 
-Keep storage-enforced read-only and domain grants in the core contract. DXOS remains a
-candidate with a known qualification failure in the inspected native path. The core contract
-and conformance design can describe required behavior and fail closed without asserting that
-DXOS implements it. Final two-real-backend acceptance remains unsatisfied until a qualifying
-second backend or DXOS enforcement path is established.
+Keep private workspace protection and app-required domain grants in the core contract. DXOS
+remains a candidate whose required behaviors are not yet runtime-qualified. The core contract and
+conformance design can describe required app behavior without asserting an unverified DXOS mapping.
+Final two-real-backend acceptance remains pending until both backends pass the mandatory scenarios.
 
-Do not automatically take on an authorization subsystem, replace the backend, or make
-read-only optional. Any of those changes requires an explicit scope decision. Native reader
-role mapping alone is no longer an evidence-backed implementation assumption.
+Do not infer enforcement from a membership label or UI filtering. Any additional authorization
+subsystem or replacement backend requires explicit architecture and scope review. Generic
+read-only membership is not part of the active requirements.
