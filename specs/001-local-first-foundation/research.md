@@ -184,3 +184,12 @@ remain required before the portable contract can be stabilized.
 design/validation sections, distinguishes remaining research from draft coverage, and records
 corrections to permission composition, immutable scope, lifecycle commands, and unknown operation
 settlement after restart. These are documentation clarifications, not backend support findings.
+
+## UI Discovery Follow-up
+
+[ui-discovery.md](ui-discovery.md) provides pinned/source-based interaction evidence, a current
+local DUI inventory, and ownership recommendations for FR-015. Existing StatusMessage and
+FieldFeedback cover operation/field feedback; do not implement stale Finance comments as new
+DUI requirements. Optional clipboard-copy and QR presentation are generic DUI candidates;
+account/recovery, pairing, membership, and backend authority disclosure remain foundation-owned.
+No reference app, component, or test was executed or modified by this discovery task.

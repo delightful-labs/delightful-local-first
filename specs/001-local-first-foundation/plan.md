@@ -55,9 +55,8 @@ for evidence and limits.
 | Specification-only scope, incremental review, approval before tests             | Satisfied by documentation-only work                                                         |
 
 Q1/Q2 were resolved explicitly by the user; the constitution's rule to preserve them until
-resolution no longer prevents dependent research. Historical constitution references to
-unanswered questions and pending tooling need a separately reviewed documentation amendment,
-not an assumed change in governing requirements.
+resolution no longer prevents dependent research. Constitution v1.0.1 reconciles the historical references to unanswered questions and pending
+tooling; no unresolved identity-isolation requirement is reintroduced.
 
 The earlier identity-isolation gate was based on an overstrong recommendation and is withdrawn
 with the user's approval. Native identity reuse is source-backed for both backends. Complete
@@ -157,11 +156,11 @@ its implementation cost must not be disguised by backend-specific types leaking 
 The draft preserves independent distribution, strict TypeScript/no casts or switch in future
 code, XState workflow ownership, domain separation, reusable presentation, local durability,
 and explicit required capabilities. No new constitutional exception is requested. Q1/Q2 use
-user-approved answers. Historical constitution wording still needs its separate reconciliation.
+user-approved answers. Constitution v1.0.1 reconciles the historical wording about decisions and tooling.
 
 The design is reviewable but is not certified or implementation-ready. Native permission
-mapping for DXOS, release version selection, precise migration deployment, remaining recovery/
-sync semantics, and evidence-based external UI discovery must be settled in follow-up design
+mapping for DXOS, release version selection, precise migration deployment, and remaining recovery/
+sync semantics must be settled in follow-up design
 before dependent implementation tasks can claim those integrations are complete. These open
 items do not erase the core behavioral contract; unsupported mappings fail qualification.
 
@@ -175,3 +174,12 @@ See [design-review.md](design-review.md) for requirement coverage, corrected lif
 ambiguities, and the remaining design work. The core remains a review draft, not an implemented
 library or a certified DXOS mapping. The actual current branch is main; no feature branch was
 created or checked out by this documentation review.
+
+## UI Discovery Follow-up
+
+[ui-discovery.md](ui-discovery.md) records source-observed recovery, device-linking, invitation,
+sharing, and loading flows from Finance, Composer, and Jazz's Band Book example. DUI already
+provides Dialog, Popover, StatusMessage, and FieldFeedback. Generic clipboard-copy feedback and
+optional QR presentation are recommendations for later DUI review; no primitive is implemented
+or assumed available. Foundation compositions own identity/workspace logic, native flow cleanup,
+and authority disclosure. This is discovery evidence, not a live usability or accessibility pass.
