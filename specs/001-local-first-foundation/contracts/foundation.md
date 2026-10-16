@@ -3,7 +3,7 @@
 **Status**: Proposed behavioral/interface design for review. No package or API is implemented.
 The draft is not stabilized until two real backends satisfy the agreed mandatory scenarios.
 [DXOS's documented membership/access model](../qualification.md) remains under qualification;
-app-required domain restrictions must not be claimed without evidence of enforcement.
+additional domain restrictions are outside the mandatory baseline unless explicitly approved by a consumer.
 
 ## Package and Dependency Boundaries
 
@@ -34,9 +34,14 @@ unknown metadata does not authorize an operation. Capabilities describe guarante
 Mandatory baseline groups:
 
 - Identity creation/resumption, recovery, second-device access, and explicit same-backend reuse.
-- Private/shared workspaces, invitations, backend-defined membership/access, and app-required policies.
+- Private/shared workspaces and invitations, with shared membership/access following the selected backend's documented model; no generic read-only/read-write role pair is required. Private workspace data is isolated from unrelated identities.
 - Portable schemas/CRUD/query observations and confirmed local persistence.
 - Explicit lifecycle cleanup, actionable errors, and documented sync/access semantics.
+
+Additional app-specific domain restrictions are outside the mandatory v1 foundation baseline.
+Finance permission-checking code is not a product requirement. A separate consumer requirement
+must be explicitly approved before adding such a policy to scope; if later required, the selected
+plugin must enforce it or fail that app's qualification.
 
 Optional transaction groups are `transactions.localAtomic` and `transactions.authorityValidated`.
 Neither implies the other or atomic remote observation. Each needs its own conformance scenarios.
@@ -102,22 +107,26 @@ No OR queries, joins, aggregates, pagination/cursors, full-text search, or arbit
 functions are part of this draft. Related records use separate observations.
 
 Null is distinct from an absent field; portable records materialize nullable fields. Range
-comparison with null never matches. Sort ascending/descending is deterministic: explicit nulls
-last in both directions, numeric/instant comparisons by value, strings by Unicode scalar order,
-and record ID ascending as the final tie-break. Explicit user sorting precedes the tie-break;
-without user sorting, use ID ascending. Plugins must normalize different native ordering or fail
-the relevant qualification; exact string/number round trips need conformance checks.
+comparison with null never matches. **Proposed technical default for review, not a user-facing
+requirement**: sort ascending/descending deterministically, with explicit nulls last in both
+directions, numeric/instant comparisons by value, strings by Unicode scalar order, and record ID
+ascending as the final tie-break. Explicit user sorting precedes the tie-break; without user sorting,
+use ID ascending. This default is recommended because it makes bounded results predictable across
+backends. Plugins must normalize different native ordering or fail the relevant qualification;
+exact string/number round trips need conformance checks.
 
-Apply predicates, sorting, then limit. A limit bounds returned results only, not downloaded data
-or backend work. Plugins disclose when filtering/sorting is local and what data must be available.
-Local postprocessing is permitted only on authorized data with a complete candidate set for the
-reported coverage; filtering an arbitrary native top-N and calling it the portable top-N is invalid.
-No adapter may silently drop a predicate or approximate a comparison.
+**Proposed technical default for review**: apply predicates, sorting, then limit. A limit bounds
+returned results only, not downloaded data or backend work. Plugins disclose when filtering/sorting
+is local and what data must be available. Local postprocessing is permitted only on authorized data
+with a complete candidate set for the reported coverage; filtering an arbitrary native top-N and
+calling it the portable top-N is invalid. No adapter may silently drop a predicate or approximate a
+comparison.
 
 Each observation reports readiness separately from coverage (`local`, `backendConfirmed`, or
-`unknown`). Local/unknown empty results describe currently available matching data, not proof that
-no authorized matching data exists elsewhere. Backend-confirmed coverage can be advertised only
-with a documented native confirmation; network connectivity alone is insufficient.
+`unknown`). **Approved conservative behavior**: a local/unknown empty result describes only currently
+available matching data, not proof that no authorized matching data exists elsewhere. Backend-
+confirmed coverage can be advertised only with a documented native confirmation; network connectivity
+alone is insufficient.
 
 Updates publish whole ordered result snapshots, with loading/empty/ready/error discriminated
 states. Observations are live as records change; errors include retryability. Disposing or
@@ -178,8 +187,8 @@ possibly committed mutation automatically.
 
 Workspace membership is the baseline: nonmembers are denied, and access for members follows the
 selected backend's documented model. Membership-management authority is checked separately. Any
-app-required domain restriction is enforced at the backend/storage boundary, not only by UI or
-foundation-side filtering. Native optimistic local state may precede final authority rejection;
+consumer-approved domain restriction declared as required is enforced at the backend/storage boundary,
+not only by UI or foundation-side filtering. Native optimistic local state may precede final authority rejection;
 this cannot be reported as final authorization or accepted by other authorized replicas as a
 legitimate write. Qualification records the enforcement point and timing, including offline limits.
 
@@ -197,16 +206,14 @@ existence of an app-declared grant record with explicit key/workspace correlatio
 access policy does not add OR to the public data-query baseline. Arbitrary callbacks, downloaded
 code, native query objects, and UI-only checks are not policy declarations.
 
-The app owns grant collections and domain scope fields. Foundation core supplies the expression
-model, not finance-specific roles, ledger selection, or permissions. Plugins compile/enforce the
-same declaration in native policies or another explicitly reviewed storage enforcement mechanism.
-Reads/writes of grant records themselves require protected policies; callers cannot self-grant.
-Updates check both the old record's authorization and the proposed new record's domain scope.
-The record ID and workspace binding are immutable through ordinary update; attempts to change
-either are rejected. Moving/copying records between workspaces is not a portable v1 operation.
-Deletes require authorization of the old record.
-Policy compilation must detect unsupported/cyclic grant dependencies and fail preflight with the
-policy ID and reason; it must not ignore clauses or accept a JS predicate instead.
+If a consumer has an explicitly approved domain restriction, the app owns its grant collections
+and domain scope fields. Foundation core may provide a portable expression model for such a
+requirement, but does not mandate Finance-specific roles, ledger selection, or permissions. A
+plugin must compile/enforce a declared required policy in native storage or another explicitly
+reviewed enforcement mechanism. Grant records must not permit self-granting; updates must not
+bypass the declared policy. The record ID and workspace binding remain immutable through ordinary
+update. These policy semantics apply only if an app-specific policy feature is separately approved;
+they are not part of the v1 mandatory baseline.
 
 The dialect is a proposed minimum to model concrete consumer grants, not an implemented universal
 policy engine. A backend may map logical workspaces to multiple native spaces, but must preserve
@@ -272,7 +279,7 @@ Backend-native identity steps use typed interaction requests for supported gener
 steps or an explicitly described external native flow. Sensitive fields stay in an ephemeral
 interaction controller, never shared actor context. An unavailable step produces an actionable
 unsupported-flow error; no assumption that every backend fits one recovery dialog sequence.
-Identity reuse must explain authority and native workspace discovery before explicit connection.
+Identity reuse must explain authority and any backend-native workspace/data access before explicit connection. Identity reuse does not itself grant portable cross-app data sharing; that workflow is deferred from v1.
 
 DUI's existing Dialog/Popover primitives are reused. Focus return, keyboard dismissal, status
 announcements, and secret cleanup remain composition acceptance criteria. A future UI discovery

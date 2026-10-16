@@ -14,9 +14,14 @@ holding the same identity authority.
 The earlier claim that neither backend had an established identity-reuse path was too broad.
 Source investigation establishes those paths and their different access consequences. No
 broker, restricted credential service, or external identity provider is required by this
-revised v1 requirement. Foundation-provided SSO, a shared workspace directory, cross-app data
-integration, and identity portability across backend technologies remain outside v1. Native
-space discovery and access after identity connection are allowed and must be explained.
+revised v1 requirement. Foundation-provided automatic SSO, a shared workspace directory, and identity portability across
+Foundation-provided automatic SSO, a shared workspace directory, and identity portability between
+backend technologies remain outside v1. Reusing an identity does not by itself share app data.
+Identity reuse alone grants no cross-workspace data access. The user endorsed an explicit request
+from one app/workspace to another and user approval or denial, analogous to consent-based service
+integrations, but decided to defer this data-sharing flow from v1 until backend capabilities and
+portable authorization semantics are evaluated. Native discovery/access after identity connection
+may occur and must be documented and explained, not assumed portable.
 
 The identity-isolation blocker is withdrawn, not marked as successfully qualified. Remaining
 data, permissions, recovery, and durability research must continue before contract stabilization.
@@ -97,7 +102,7 @@ Sources: [identity signer and device admission](https://github.com/dxos/dxos/blo
 
 This is the native multi-app data model the user wanted to preserve. Separate app schemas,
 spaces, and tags can organize data, but must not be presented as isolating apps that hold the
-same identity authority. The connection interaction must disclose shared space access.
+same identity authority. The identity-connection interaction must disclose native authority/access. Shared identity does not imply shared app data. The user endorsed an explicit app/workspace access request-and-approval workflow but deferred it from v1 pending backend-capability evaluation.
 
 For genuinely separate principals, DXOS also supports separate identities invited to selected
 spaces. The invitation path admits an identity to a specific space and the recipient verifies
@@ -121,12 +126,12 @@ credential scope, space discovery, and access when connecting a second app. Chec
 connection interaction explains the consequences before explicit connection. Shared root or
 device authority is permitted; no universal denial between those apps is required.
 
-Continue qualifying private workspace protection and direct denial of operations outside
-app-required domain grants. Do not substitute tags, filtered queries, or hidden controls for
-required permission enforcement. Document backend-defined membership/access levels without
-assuming a generic read-only role. Recovery/device linking, generic null/range/AND filtering,
-sorted bounded reactive results, local durability, later rejection, and optional transaction
-semantics still require further evidence and eventually executable qualification.
+Continue qualifying private workspace protection. Document backend-defined membership/access
+levels without assuming a generic read-only role. Finance permission-checking code is not a product
+requirement; qualify other domain restrictions only after explicit consumer approval. Recovery/device
+linking, generic null/range/AND filtering, sorted bounded reactive results, local durability, later
+rejection, and optional transaction semantics still require further evidence and eventually
+executable qualification.
 
 No claim of full qualification follows from this investigation. A failure of another mandatory
 requirement must still block qualification or prompt an explicit user scope decision. Backend
@@ -147,10 +152,11 @@ Both backends have concrete primitives for the practical query baseline; DXOS al
 host-storage flush acknowledgement. None of these findings substitutes for restart/failure tests.
 
 The traced DXOS native peer data path admits nonremoved members to replication and its inbound
-mutation policy is permissive. This is recorded as a backend access-model limitation, not a
-failure against a generic read-only membership requirement, which the user has removed. Private
-workspace protection and app-required domain restrictions remain requirements and must be
-qualified independently; membership administration and domain authorization must not be conflated.
+mutation policy is permissive. This is recorded as backend access-model evidence, not a failure
+against a generic read-only membership requirement, which is not in scope. Private workspace
+protection remains a requirement and must be qualified. Finance permission-checking code is not an
+approved product requirement; evaluate additional domain restrictions only if explicitly approved
+for a consumer. Membership administration and domain authorization must not be conflated.
 
 ## Follow-up: Published DXOS and Alternate Enforcement
 
@@ -160,10 +166,10 @@ Keyhive migration plan. Published code reproduces the permission limitation. Key
 control exists as separate alpha Automerge work, while DXOS's integration remains draft in
 the audited source. No supported native fix was established.
 
-Recommendation: preserve private workspace protection and app-required domain restrictions;
-retain DXOS as an unqualified candidate until those mandatory behaviors are validated. Do not
-claim generic read-only membership support or implicitly expand this project into an authorization
-subsystem. Full two-backend acceptance remains future work.
+Recommendation: preserve private workspace protection; retain DXOS as an unqualified candidate
+until mandatory behaviors are validated. Do not claim generic read-only membership support or
+implicitly expand this project into an authorization subsystem. Finance permission-checking code
+is not a product requirement. Full two-backend acceptance remains future work.
 
 ## Core Design Draft Following Review of the Native Limits
 

@@ -40,11 +40,11 @@ ineligible DXOS deployment substitutes for the second qualified real backend.
 
 | Scenario                                                                   | Expected result                                                                                                             |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Incompatible contract or missing baseline/app capability                   | Actionable preflight failure before dependent operations; unsupported app-required restrictions remain rejected              |
+| Incompatible contract or missing baseline capability                        | Actionable preflight failure before dependent operations                                                                     |
 | Create/resume/recover/connect identity, second-device flow                 | Explicit native outcomes, no duplicate identity on retry, authority disclosure before reuse                                 |
 | Cancel/interrupt identity interaction                                      | Transient credentials cleared; no false completion or claim to revoke already-granted authority                             |
-| Unrelated identity reads/writes personal workspace                         | Denied at the storage boundary, including direct native access attempts                                                     |
-| Unauthorized identity accesses private workspace; member attempts outside app-required domain grant | Denied at the applicable storage boundary; record enforcement point/timing, including offline cases                         |
+
+| Unrelated identity accesses a private workspace                              | Denied at the applicable storage boundary; record enforcement point/timing, including offline cases                         |
 | Repeated invitation acceptance                                             | Existing membership or explicit terminal outcome, no duplicate grant                                                        |
 | Same schema/CRUD/query on both backends                                    | Identical portable consumer declarations/code; null/range/AND/sort/limit semantics match draft contract                     |
 | Bounded query receives insert/update/delete, null values, tied sort values | Correct ordered bounded snapshots with deterministic IDs as tie-breakers                                                    |
@@ -58,8 +58,9 @@ ineligible DXOS deployment substitutes for the second qualified real backend.
 
 Additional contract-review scenarios:
 
-- An app policy cannot authorize a nonmember; required grants missing from a collection produce
-  denial, not a fallback to open access. Workspace member access levels follow the backend model.
+- An unrelated identity cannot access another identity's private workspace. Workspace member
+  access levels follow the selected backend's documented model. No cross-app data-sharing flow is
+  required for v1 qualification.
 - Patching record ID/workspace, explicit undefined, and unknown fields fails validation; an old
   workspace handle fails with scope.stale instead of following the newly selected workspace.
 - Close preserves the documented session selection; logout invalidates the selected session;
@@ -80,5 +81,5 @@ routine deterministic checks but never establishes cross-backend parity.
 
 Current result: source investigation only; neither backend is fully qualified and the draft
 contract is not stabilized. Review the design before task generation. Final acceptance still
-requires Jazz plus a second real backend passing all mandatory foundation and app-required
-scenarios.
+requires Jazz plus a second real backend passing all mandatory foundation scenarios; additional
+consumer-specific scenarios require explicit product approval.

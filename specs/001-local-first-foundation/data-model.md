@@ -35,36 +35,42 @@ Domain references identify a declared collection and record ID; they are not nat
 
 Workspace access levels and membership roles follow the selected backend's supported model and
 must be documented by its plugin. Ownership/admin authority for creating invitations or changing
-membership is distinct from data access and must be mapped explicitly. The foundation does not
-require a generic reader/writer role pair. Granting private personal access must be idempotent on
+membership is distinct where the backend distinguishes it and must be mapped explicitly. The
+foundation requires invited shared-workspace access but does not normalize backend roles into
+generic read-only/read-write permissions. Granting private personal access must be idempotent on
 resumption; do not create another identity or workspace on transient failure.
 
 ## Portable Domain Fields
 
-Initial proposed scalar descriptors are string, boolean, finite number, safe integer, UTC instant,
-and typed record reference, each with explicit nullability. UTC instants use integer milliseconds
-at the public boundary; adapters may convert to native timestamp objects. Safe integers must
-round-trip exactly within JavaScript's safe range. Plugins must reject schemas they cannot
-represent faithfully rather than round, truncate, stringify implicitly, or downgrade constraints.
+The user approved this v1 portable field set on 2026-10-15: string, boolean, finite number, safe
+integer, UTC instant, and typed record reference, each with explicit nullability. UTC instants use
+integer milliseconds at the public boundary; adapters may convert to native timestamp objects.
+Safe integers must round-trip exactly within JavaScript's safe range. Plugins must reject schemas
+they cannot represent faithfully rather than round, truncate, stringify implicitly, or downgrade
+constraints.
 
 All stored/read fields are materialized: a nullable field has an explicit null value, while an
 omitted patch field means unchanged. Required fields cannot be omitted on create. An omitted
-nullable create field normalizes to null. Explicit undefined is not a portable stored value;
-unknown fields and attempts to patch record ID/workspace binding are rejected. Arrays, arbitrary
-JSON, binary data, custom CRDT types,
-and polymorphic payloads are not included in this proposed first scalar set; richer schema types
-need explicit later contract evolution. These are reviewable design choices, not claims about
-which native types either backend supports.
+nullable create field normalizes to null. The user approved these create/update nullability rules
+on 2026-10-15. Explicit undefined is not a portable stored value; unknown fields and attempts to
+patch record ID/workspace binding are rejected. The user approved immutable record IDs and workspace
+bindings on 2026-10-15; changing workspace requires a separate create/copy-and-delete workflow. Arrays, arbitrary JSON, binary data, custom CRDT types, and polymorphic payloads are excluded from
+the v1 portable schema. The user approved these exclusions on 2026-10-15; richer schema types need
+explicit later contract evolution. This is not a claim about which native types either backend
+supports.
 
-References are same-workspace by default; cross-workspace references are outside the portable
-v1 contract. Reference lookup is a separate observation and remains authorization-scoped. An ID
-reference does not imply a join, cascade deletion, uniqueness check, or foreign-key transaction.
-Whether the target is absent, deleted, unavailable locally, or unauthorized must not leak data
-or be mistaken for referential-integrity enforcement.
+The approved v1 field set keeps references same-workspace; cross-workspace references are outside
+the portable v1 contract. The user approved this boundary on 2026-10-15. **Provisional technical
+default**: a reference is a typed ID; related records use separate authorization-scoped observations.
+The user agreed this seems reasonable for v1, while noting uncertainty. A reference does not imply
+a join, cascade deletion, uniqueness check, or foreign-key transaction. Whether the target is absent,
+deleted, unavailable locally, or unauthorized must not leak data or be mistaken for referential-
+integrity enforcement.
 
 A normal delete removes the record from current portable query results after local acceptance.
-It does not promise physical erasure from CRDT history, backups, or other replicas. Native
-retention and revocation limits remain qualification metadata.
+It does not promise physical erasure from CRDT history, backups, or other replicas. The user
+confirmed this expected local-first behavior for v1 on 2026-10-15. Native retention and revocation
+limits remain qualification metadata.
 
 ## State and Validation Rules
 
@@ -88,4 +94,5 @@ retention and revocation limits remain qualification metadata.
 Schema evolution is versioned and app-owned. Initial design supports opening the declared current
 schema only when the plugin has a valid deployment/migration path. Unsupported changes fail startup
 with an actionable error; a universal migration DSL and backend-to-backend migration are not v1
-features. Concrete migration mechanics stay with plugins until separately designed and qualified.
+features. The user approved this v1 boundary on 2026-10-15. Concrete migration mechanics stay with
+plugins until separately designed and qualified.

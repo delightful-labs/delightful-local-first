@@ -14,6 +14,37 @@ Both are source snapshots already downloaded for identity investigation, not sel
 SDK/server combinations. Upstream tests were read as evidence where relevant, not executed.
 A declared enum or method is not proof of enforcement, persistence, or crash safety.
 
+## Compatibility Status (Source Review Only)
+
+This matrix separates source evidence from runtime qualification. **Source-supported** means the
+pinned code or documentation contains relevant primitives; it does not establish that a proposed
+adapter preserves the portable contract. **Open** means the current evidence is insufficient to
+claim compatibility. No row below is runtime-qualified.
+
+| Mandatory area | Jazz | DXOS | Current conclusion |
+| --- | --- | --- | --- |
+| Identity reuse across apps | Source-supported: same root identity can map to separate app accounts | Source-supported: joining identity authority can expose existing native spaces | Plausible in both with backend-specific disclosure; identity reuse does not imply shared app data. Portable cross-app sharing is deferred from v1. Recovery and exact selected-version behavior remain unqualified |
+| Portable schema and CRUD | Source-supported primitives | Source-supported primitives | Plausible; exact scalar mapping, validation, deletion behavior, and round-trips remain to design and qualify |
+| Query/filter baseline | Source-supported queries and null lowering | Source-supported filter/query builders | Plausible, not established parity; comparison boundaries, collation, null/absence normalization, proposed deterministic ordering, and bounded reactive results need conformance |
+| Reactive observations and lifecycle cleanup | Subscription teardown observed in source | Query-result cleanup observed in source | Primitives exist; session/workspace invalidation, detached snapshots, stale callback suppression, and error behavior remain unqualified |
+| Local durability and later settlement | Local persistence and remote rejection are distinct in cited evidence | Disk/host flush paths are visible in cited source | Required offline-restart durability and settlement behavior remain unqualified for both |
+| Private workspace protection | Authorization primitives are present; exact deployment mapping remains unqualified | Native identity/space membership exists; private data isolation mapping remains unqualified | Must verify that unrelated identities cannot access private workspace data at the relevant storage boundary |
+| Invited shared workspaces | Sharing primitives exist; invitation and membership mapping need qualification | Space invitation/membership primitives exist; invitation and membership mapping need qualification | Required behavior is shared access via invitation; map backend-native membership without requiring normalized read-only/read-write roles |
+| Additional app-specific domain restrictions (not baseline) | Row-policy primitives are source-supported | Current traced native peer path has permissive inbound replication; other enforcement mappings are unverified | Not a v1 qualification area. Finance permission-checking code is not a product requirement; revisit only if a consumer explicitly approves a restriction. |
+| Recovery and second-device linking | Recovery/passkey mechanisms are documented; end-to-end flow and device semantics remain open | HALO join/recovery APIs exist; enrollment, service, offline, and recovery behavior remain open | Not qualified for either backend |
+| Optional local-atomic transaction | Related API exists; exact crash/restart guarantee and visibility remain open | Multi-object crash atomicity not established | Optional; do not advertise until separately qualified |
+| Optional authority-validated transaction | Related API exists; exact conflict/authority semantics remain open | Not established by current review | Optional; do not advertise until separately qualified |
+
+Therefore, the current plan is **not yet demonstrated compatible end to end with both libraries**. The
+portable contract can continue as a design draft. Identity reuse is distinct from data sharing. The user endorsed an explicit app/workspace request
+and user approval flow but deferred it from v1 pending backend-capability evaluation. Do not promise
+portable cross-workspace data sharing in v1. Qualification of the v1 baseline does not require a
+cross-app data-sharing flow. To claim compatibility, first pin released SDK, server,
+and configuration versions for each backend, then resolve the open design mappings and run approved
+conformance/qualification scenarios. A failed mandatory behavior blocks that backend/app
+combination; no capability is silently weakened. This matrix is a planning aid, not a task list or
+runtime test report.
+
 ## Mandatory Data Baseline
 
 | Behavior                         | Jazz source evidence                                              | DXOS source evidence                                            | Design consequence                                                                                                     |
@@ -49,12 +80,13 @@ Native query primitives make the practical baseline plausible for both backends.
 precision, string collation, absent/null normalization, observation ordering, and crash behavior
 are still design/conformance work. Do not claim parity merely because operator names match.
 
-## Authorization: Backend Membership Models and App-Required Restrictions
+## Authorization: Backend Membership Models and Conditional Domain Restrictions
 
 Jazz provides row policies for reads/inserts/updates/deletes, including correlated grants and
-old/new-row checks. Finance's selected-account policies provide concrete reference consumer
-requirements. Core rejection is separate from optimistic local application: a local write can
-appear or persist before the authority rejects it. The portable operation lifecycle must retain
+old/new-row checks. Finance code includes selected-account policy checks, but this behavior is not an approved
+Finance requirement and must not be treated as v1 foundation scope or a required Finance consumer
+capability. Core rejection is separate from optimistic local application: a local write can appear
+or persist before the authority rejects it. The portable operation lifecycle must retain
 later rejection and must not call local durability proof of final authorization.
 
 Sources: [permission model](https://jazz.tools/docs/auth/permissions),
@@ -88,8 +120,8 @@ establish enforcement against direct native access. This is source-level analysi
 exploit result or a claim that no possible DXOS-based architecture could enforce a required policy.
 
 Space partitioning can potentially express access to selected subsets by placing protected data
-in separate spaces. A foundation adapter that only checks its own mutation calls does not establish
-enforcement against direct native access for any app-required restriction. A custom lower-level
+in separate spaces. A foundation adapter that only checks its own mutation calls does not establish enforcement
+against direct native access for a consumer-approved domain restriction. A custom lower-level
 enforcement mechanism or another version/replication path would require explicit architecture
 review and qualification; neither is assumed to exist or silently added by this document.
 
@@ -112,14 +144,17 @@ Do not advertise those capabilities until separately qualified.
 
 ## Review Outcome and Next Work
 
-The portable query baseline has concrete native building blocks in both codebases. The DXOS
+The source review supports provisional design work for identity reuse, schema/CRUD, and query
+primitives, but does not show end-to-end compatibility with either released backend configuration.
+The DXOS
 reader/editor write distinction is not a mandatory foundation capability. Private workspace
-protection and any app-required domain restrictions still need evidence-backed qualification.
-If DXOS cannot enforce a restriction required by a particular app, that app/backend combination
-must not qualify unless an enforcement architecture is explicitly reviewed and validated.
+protection still needs evidence-backed qualification. Domain-restriction scenarios based on Finance
+permission-checking code are out of scope unless explicitly approved as product requirements.
 
-Continue design only with the limitation visible. No foundation/plugin code, implementation
-tests, service, backend replacement, or requirement amendment is authorized by this source audit.
+Before compatibility can be claimed, pin released SDK/server/configuration versions, finalize
+portable semantic mappings, and approve/run the corresponding qualification scenarios. No
+foundation/plugin code, implementation tests, service, backend replacement, or requirement
+amendment is authorized by this source audit.
 
 ## Follow-up: Alternate DXOS Enforcement Paths
 
@@ -182,10 +217,12 @@ Source: [Automerge's alpha integration guide](https://automerge.org/docs/keyhive
 
 ### Recommended planning treatment
 
-Keep private workspace protection and app-required domain grants in the core contract. DXOS
-remains a candidate whose required behaviors are not yet runtime-qualified. The core contract and
-conformance design can describe required app behavior without asserting an unverified DXOS mapping.
-Final two-real-backend acceptance remains pending until both backends pass the mandatory scenarios.
+Keep private workspace protection in the mandatory core contract. Additional app-specific domain
+grants are conditional on explicit consumer approval. Both backends remain unqualified;
+source-supported primitives are not evidence that the complete contract maps to either backend.
+The core contract and conformance design can describe required behavior without asserting
+unverified mappings. Final two-real-backend acceptance remains pending until both pinned backend
+configurations pass the mandatory scenarios.
 
 Do not infer enforcement from a membership label or UI filtering. Any additional authorization
 subsystem or replacement backend requires explicit architecture and scope review. Generic
