@@ -38,23 +38,23 @@ ineligible DXOS deployment substitutes for the second qualified real backend.
 
 ## Acceptance Scenarios
 
-| Scenario                                                                   | Expected result                                                                                                             |
-| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Incompatible contract or missing baseline capability                        | Actionable preflight failure before dependent operations                                                                     |
-| Create/resume/recover/connect identity, second-device flow                 | Explicit native outcomes, no duplicate identity on retry, authority disclosure before reuse                                 |
-| Cancel/interrupt identity interaction                                      | Transient credentials cleared; no false completion or claim to revoke already-granted authority                             |
+| Scenario                                                   | Expected result                                                                                 |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Incompatible contract or missing baseline capability       | Actionable preflight failure before dependent operations                                        |
+| Create/resume/recover/connect identity, second-device flow | Explicit native outcomes, no duplicate identity on retry, authority disclosure before reuse     |
+| Cancel/interrupt identity interaction                      | Transient credentials cleared; no false completion or claim to revoke already-granted authority |
 
-| Unrelated identity accesses a private workspace                              | Denied at the applicable storage boundary; record enforcement point/timing, including offline cases                         |
-| Repeated invitation acceptance                                             | Existing membership or explicit terminal outcome, no duplicate grant                                                        |
-| Same schema/CRUD/query on both backends                                    | Identical portable consumer declarations/code; null/range/AND/sort/limit semantics match draft contract                     |
-| Bounded query receives insert/update/delete, null values, tied sort values | Correct ordered bounded snapshots with deterministic IDs as tie-breakers                                                    |
-| Empty local query while offline                                            | Empty with local/unknown coverage; no unsupported global completeness claim                                                 |
-| Locally durable write, process restart offline                             | Acknowledged change available; persistence failure never reported durable                                                   |
-| Later remote rejection after local acknowledgement or restart              | Active runtime delivers rejection; restart reconciliation uses native evidence or reports unknown, never assumed acceptance |
-| Scope switch/dispose during pending work                                   | Obsolete observers stop and sensitive old-scope presentation data clears                                                    |
-| Optional local-atomic transaction, injected failure/restart                | All-or-none persisted group; absent capability prevents all group writes                                                    |
-| Optional authority transaction, concurrent conflict/offline authority      | Correct accept/reject/pending outcome, never false authority acceptance                                                     |
-| Keyboard/dialog dismissal/localized status                                 | Semantic controls, appropriate focus return, no duplicate announcements, no hardcoded messages                              |
+| Unrelated identity accesses a private workspace | Denied at the applicable storage boundary; record enforcement point/timing, including offline cases |
+| Repeated invitation acceptance | Existing membership or explicit terminal outcome, no duplicate grant |
+| Same schema/CRUD/query on both backends | Identical portable consumer declarations/code; null/range/AND/sort/limit semantics match draft contract |
+| Bounded query receives insert/update/delete, null values, tied sort values | Correct ordered bounded snapshots with deterministic IDs as tie-breakers |
+| Empty local query while offline | Empty with local/unknown coverage; no unsupported global completeness claim |
+| Locally durable write, process restart offline | Acknowledged change available; persistence failure never reported durable |
+| Later remote rejection after local acknowledgement or restart | Active runtime delivers rejection; restart reconciliation uses native evidence or reports unknown, never assumed acceptance |
+| Scope switch/dispose during pending work | Obsolete observers stop and sensitive old-scope presentation data clears |
+| Optional local-atomic transaction, injected failure/restart | All-or-none persisted group; absent capability prevents all group writes |
+| Optional authority transaction, concurrent conflict/offline authority | Correct accept/reject/pending outcome, never false authority acceptance |
+| Keyboard/dialog dismissal/localized status | Semantic controls, appropriate focus return, no duplicate announcements, no hardcoded messages |
 
 Additional contract-review scenarios:
 

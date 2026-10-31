@@ -6,7 +6,96 @@
 	},
 	"rules": {
 		"typescript/no-explicit-any": "error",
-		"typescript/consistent-type-assertions": ["error", { "assertionStyle": "never" }]
+		"typescript/consistent-type-assertions": [
+			"error",
+			{
+				"assertionStyle": "never"
+			}
+		],
+		"no-restricted-imports": [
+			"error",
+			{
+				"patterns": [
+					{
+						"regex": "(^|/)(delightful-finances|delightful-finance|finance)(/|$)|^[$#]finance(/|$)",
+						"message": "Finance domain code belongs to the consumer, never this shared library."
+					},
+					{
+						"regex": "^jazz-tools(/|$)",
+						"message": "Direct Jazz imports belong only in src/lib/backend/jazz/."
+					}
+				]
+			}
+		]
 	},
-	"ignorePatterns": [".agents/**", ".specify/templates/**", ".specify/scripts/**"]
+	"ignorePatterns": [
+		".agents/**",
+		".specify/templates/**",
+		".specify/scripts/**",
+		"storybook-static/**",
+		".netlify/**",
+		"dist/**",
+		".svelte-kit/**",
+		"src/lib/paraglide/**",
+		"project.inlang/cache/**",
+		"vendor/**"
+	],
+	"overrides": [
+		{
+			"files": ["src/lib/backend/jazz/**"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"regex": "(^|/)(delightful-finances|delightful-finance|finance)(/|$)|^[$#]finance(/|$)",
+								"message": "Finance domain code belongs to the consumer, never this shared library."
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			"files": ["src/lib/components/**"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"regex": "(^|/)(delightful-finances|delightful-finance|finance)(/|$)|^[$#]finance(/|$)",
+								"message": "Finance domain code belongs to the consumer, never this shared library."
+							},
+							{
+								"regex": "^jazz-tools(/|$)",
+								"message": "Direct Jazz imports belong only in src/lib/backend/jazz/."
+							},
+							{
+								"regex": "^(xstate|@xstate/[^/]+)(/|$)|(^|/)(machines|backend|integrations)(/|$)|^delightful-local-first(/|$)",
+								"message": "Pure presentation uses props and callbacks; import actors/backend wiring in integrations instead."
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			"files": ["fixtures/package-consumer/jazz.js"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"regex": "(^|/)(delightful-finances|delightful-finance|finance)(/|$)|^[$#]finance(/|$)",
+								"message": "Finance domain code belongs to the consumer, never this shared library."
+							}
+						]
+					}
+				]
+			}
+		}
+	]
 }

@@ -4,15 +4,104 @@
 	"type": "module",
 	"packageManager": "pnpm@10.22.0",
 	"engines": {
-		"node": ">=22.12.0"
+		"node": "^22.17.0 || >=24.0.0"
 	},
 	"scripts": {
 		"format": "oxfmt .",
 		"format:check": "oxfmt --check .",
-		"lint": "oxlint --deny-warnings --no-error-on-unmatched-pattern ."
+		"lint": "oxlint --deny-warnings --no-error-on-unmatched-pattern .",
+		"storybook": "pnpm paraglide && storybook dev --host 127.0.0.1 --port 6006 --exact-port --disable-telemetry",
+		"build-storybook": "pnpm paraglide && storybook build --disable-telemetry",
+		"check": "pnpm paraglide && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings && tsc --noEmit --project tsconfig.json",
+		"check:watch": "pnpm paraglide && svelte-check --tsconfig ./tsconfig.json --watch",
+		"package": "pnpm paraglide && svelte-package --input src/lib --output dist && publint --strict",
+		"check:consumer": "tsc --noEmit --project fixtures/package-consumer/tsconfig.json && node fixtures/package-consumer/import.js && vite build --config fixtures/package-consumer/vite.config.ts",
+		"verify": "pnpm format:check && pnpm lint && pnpm check && pnpm test:unit --run && pnpm package && pnpm check:consumer && pnpm build-storybook",
+		"test:unit": "pnpm paraglide && vitest --config vitest.config.ts",
+		"paraglide": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy baseLocale --emit-ts-declarations --no-emit-readme --no-emit-prettier-ignore --no-emit-git-ignore",
+		"test:storybook": "playwright test --config playwright.config.ts"
 	},
 	"devDependencies": {
+		"@inlang/paraglide-js": "2.27.0",
+		"@opentelemetry/api": "1.9.1",
+		"@playwright/test": "1.60.0",
+		"@poppanator/sveltekit-svg": "7.0.1",
+		"@storybook/addon-docs": "10.6.2",
+		"@storybook/addon-svelte-csf": "5.1.5",
+		"@storybook/svelte-vite": "10.6.2",
+		"@sveltejs/package": "3.0.2",
+		"@sveltejs/vite-plugin-svelte": "7.2.0",
+		"@types/node": "24.19.2",
+		"delightful-ui": "file:vendor/delightful-ui-0.0.25-details-animation.tgz",
+		"jazz-tools": "2.0.0-alpha.59",
 		"oxfmt": "0.73.0",
-		"oxlint": "1.88.0"
+		"oxlint": "1.88.0",
+		"publint": "0.3.25",
+		"storybook": "10.6.2",
+		"svelte": "5.57.2",
+		"svelte-check": "4.6.0",
+		"typescript": "6.0.3",
+		"vite": "8.3.0",
+		"vitest": "4.1.8",
+		"xstate": "5.33.2"
+	},
+	"version": "0.0.0",
+	"description": "Reusable local-first identity and workspace foundations for Delightful apps.",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./recovery": {
+			"types": "./dist/recovery.d.ts",
+			"svelte": "./dist/recovery.js",
+			"default": "./dist/recovery.js"
+		},
+		"./recovery/workflow": {
+			"types": "./dist/machines/identity/recovery-phrase.d.ts",
+			"default": "./dist/machines/identity/recovery-phrase.js"
+		},
+		"./recovery/messages": {
+			"types": "./dist/localization/recovery.d.ts",
+			"default": "./dist/localization/recovery.js"
+		},
+		"./recovery/contracts": {
+			"types": "./dist/contracts/recovery-phrase.d.ts",
+			"default": "./dist/contracts/recovery-phrase.js"
+		},
+		"./recovery/svelte": {
+			"types": "./dist/integrations/identity/RecoveryPhrase.svelte.d.ts",
+			"svelte": "./dist/integrations/identity/RecoveryPhrase.svelte",
+			"default": "./dist/integrations/identity/RecoveryPhrase.svelte"
+		},
+		"./backend/jazz/recovery": {
+			"types": "./dist/backend/jazz/recovery-phrase.d.ts",
+			"default": "./dist/backend/jazz/recovery-phrase.js"
+		}
+	},
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"peerDependencies": {
+		"delightful-ui": "0.0.25",
+		"jazz-tools": "2.0.0-alpha.59",
+		"svelte": "^5.57.2",
+		"xstate": "5.33.2"
+	},
+	"peerDependenciesMeta": {
+		"xstate": {
+			"optional": true
+		},
+		"delightful-ui": {
+			"optional": true
+		},
+		"jazz-tools": {
+			"optional": true
+		}
 	}
 }

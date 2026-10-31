@@ -6,5 +6,17 @@
 	"trailingComma": "none",
 	"printWidth": 100,
 	"sortPackageJson": false,
-	"ignorePatterns": [".agents/**", ".specify/templates/**", ".specify/scripts/**", "pnpm-lock.yaml"]
+	"ignorePatterns": [
+		".agents/**",
+		".specify/templates/**",
+		".specify/scripts/**",
+		"pnpm-lock.yaml",
+		"storybook-static/**",
+		".netlify/**",
+		"dist/**",
+		".svelte-kit/**",
+		"src/lib/paraglide/**",
+		"project.inlang/cache/**",
+		"vendor/**"
+	]
 }

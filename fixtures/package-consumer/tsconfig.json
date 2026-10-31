@@ -1,0 +1,12 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"types": [],
+		"skipLibCheck": false,
+		"exactOptionalPropertyTypes": false
+	},
+	"include": ["./consumer.ts", "./import.js", "./view.ts", "./vite.config.ts"],
+	"exclude": []
+}
