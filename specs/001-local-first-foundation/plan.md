@@ -147,8 +147,19 @@ restart scenarios (unanswered authority and offline reads/saves); full source an
 The startup debug diagnostic fixture was subsequently corrected and passed with debugging both on
 and off. Finance's existing SDK provider, domain workflows, and workspace cleanup remain intact.
 
-The next proposed design is [acquired session readiness and retry](readiness/plan.md). It preserves
-Finance's pre-drain authorization and issued-operation retention while extracting observation and
-retry settlement. This documentation review does not authorize implementation tests or workspace
-migration. Earlier first-slice proposals above are historical; current slice artifacts and shipped
-contracts govern implemented behavior.
+## Acquired session readiness and workspace continuation
+
+Library readiness PR #4 and Finance adoption PR #39 are merged at library main `9372e0a` and Finance
+main `f83be67`. Status observation and issued SDK retry now use the shared workflow; Finance retains
+pre-drain authorization, restoration, navigation, and domain resource ownership.
+
+Approved verification passed: 33 library workflow/backend cases and built-package consumer checks;
+68 Finance readiness/runtime unit cases; 11 authentication browser scenarios; debug on/off startup
+diagnostics; two production cold/offline read/save scenarios; full source and browser-test types.
+The subsequent transfer fixture correction preserves the active workspace and checks live conflict
+invalidation; it passed three isolated cases with two workers. These are qualification results for
+those tested paths, not proof of complete workspace extraction or universal offline query coverage.
+
+The next proposed ownership design is [workspace lifecycle](workspaces/plan.md): selection/switching
+first, private creation next, then reusable compositions. Earlier first-slice proposals above are
+historical; current slice artifacts and shipped contracts govern implemented behavior.

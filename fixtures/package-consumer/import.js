@@ -10,3 +10,5 @@ import 'delightful-local-first/restoration/workflow'
 import 'delightful-local-first/backend/jazz/restoration'
 
 import './session.js'
+
+import './workspace.js'
