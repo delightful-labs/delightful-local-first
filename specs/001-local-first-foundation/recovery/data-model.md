@@ -24,7 +24,9 @@ re-evaluates the same condition and the leaf rechecks the live binding at export
 
 ```mermaid
 stateDiagram-v2
-    [*] --> unavailable
+    [*] --> assessing
+    assessing --> hidden: current available scope
+    assessing --> unavailable: unavailable or stale scope
     unavailable --> hidden: OBSERVE available scope
     hidden --> revealing: REVEAL with current capability
     revealing --> unconfirmed: current nonempty result
@@ -34,7 +36,8 @@ stateDiagram-v2
         confirmed --> unconfirmed: CONFIRM false
     }
     failed --> revealing: RETRY with current capability
-    revealed --> hidden: HIDE / explicit acknowledged completion
+    revealed --> hidden: HIDE
+    confirmed --> hidden: COMPLETE
     revealing --> hidden: HIDE
     failed --> hidden: HIDE
     hidden --> unavailable: OBSERVE unavailable
@@ -49,8 +52,7 @@ stateDiagram-v2
     closed --> [*]
 ```
 
-Initial state is selected from the initial scope (hidden if available). Diagram shows the unavailable
-initial case. Replacement by a different available scope from **any nonterminal state** clears phrase
+Initial assessment selects hidden for a currently available scope and unavailable otherwise. Replacement by a different available scope from **any nonterminal state** clears phrase
 and acknowledgement, cancels the old invoke, and enters hidden with the new binding/generation.
 Repeated equal observations do not reset a revealed interaction. Late prior-scope completions never
 publish a view. Scope invalidation has priority over completion/retry; recheck current scope before
@@ -64,7 +66,8 @@ single local conversion. Multi-step restoration and its success/failure model be
 
 ## Events and Results
 
-User events: REVEAL, RETRY, CONFIRM(value), HIDE. Integration events: OBSERVE(scope), SHUTDOWN.
+User events: REVEAL, RETRY, CONFIRM(value), HIDE, COMPLETE. COMPLETE is accepted only in the
+confirmed substate; ordinary dismissal never requires acknowledgement. Integration events: OBSERVE(scope), SHUTDOWN.
 Commands never carry phrase text. Invocation completion is private and contains the phrase only until
 it is assigned/discarded. Public callbacks, if needed, report only dismissed/acknowledged/unavailable
 or sanitized failure; do not emit phrase, raw snapshots, or a durable backup-complete event.

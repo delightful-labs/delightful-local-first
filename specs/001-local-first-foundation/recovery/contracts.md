@@ -24,7 +24,13 @@ force a Jazz installation. No claim of independently distributable backend plugi
 
 ## Host Binding and Jazz Adapter
 
-The host supplies an available/unavailable scope and a matching phrase-read capability. Available
+The host supplies an available/unavailable scope and a matching phrase-read capability. The
+capability includes a total, synchronous `isCurrentScope(scope)` predicate over current binding facts
+(no I/O), checked before reveal/retry and before accepting output. The host must publish immutable
+scope observations promptly; the predicate cannot replace invalidation of an already displayed view.
+The supplied capability is fixed for one machine instance. If the capability itself is replaced,
+shut down the old actor before creating a new one; OBSERVE updates scopes served by the same capability.
+Available
 scope consists of identity ID plus non-secret dependency token and generation. The host observes
 identity/session changes using its existing SDK integration. The source adapter captures scope
 against its current account accessor and performs a final same-handle/same-ID/same-generation check
@@ -80,7 +86,7 @@ locale before packaging and keep static/per-locale specialization disabled.
 DUI supplies native dialog and fields. Derive unique warning/field/heading associations per instance;
 never copy Finance's fixed IDs. All close/Escape/backdrop/unmount/scope-invalidation paths reach the
 same idempotent clear path. Users may dismiss without acknowledging; only the explicit acknowledged
-completion action requires confirmed state. Keep loading/failure feedback in one non-secret live
+completion uses a distinct COMPLETE command accepted only in confirmed state. Keep loading/failure feedback in one non-secret live
 region and phrase out of live announcements. Use existing DUI tokens and scoped layout only; no
 implicit theme/reset import or new public CSS properties are needed.
 
