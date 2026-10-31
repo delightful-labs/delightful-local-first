@@ -1,6 +1,6 @@
 # Owned Recovery Integration and Jazz Adapter
 
-**Status**: Implementation for review; adapter/integration tests are not added or run yet.
+**Status**: Implementation committed; focused adapter/integration coverage added for review.
 Finance adoption remains a separately reviewed change.
 
 ## Ownership model
@@ -101,14 +101,15 @@ The live accessor also catches changed handles before reveal and result acceptan
 has not arrived yet. Neither mechanism can intercept arbitrary unobserved external identity changes
 or erase strings already retained by a caller. JavaScript reference cleanup is not memory zeroing.
 
-## Checks and next coverage
+## Coverage and next adoption
 
-This cycle uses strict checks, lint, formatting, package validation and public export inspection.
-The existing pure-view stories still use synthetic capabilities and are not modified to hide or
-simulate an actual Jazz integration. No source-based demo qualifies physical SDK module sharing.
+Adapter tests use SDK-issued handles and an isolated in-memory account store. They cover local
+export, generation stability and replacement, A → B → A, foreign bindings, invalidation, unsupported
+issuers, getter failures, and unavailable retained roots. Assertions never print generated secrets.
+SSR checks render the real composition without acquiring subscriptions or exporting a phrase.
 
-After implementation review, identify and add focused coverage for generation stability/changes,
-unsupported issuers, invalidation, live getter failures, local export failures, source subscribe/cleanup,
-source/capability replacement, late results, message changes without actor restart, and SSR no-subscribe
-behavior. Use synthetic integration fixtures for UI and isolated actual Jazz handles for the adapter.
-Do not run or rewrite existing tests merely to claim this new boundary is already verified.
+Synthetic browser stories exercise subscription cleanup, source/capability replacement, late results,
+unmount/remount, scope invalidation, live message changes, and sanitized subscription failure.
+The built-package consumer fixture also exports through a host-issued Jazz handle using public
+package entries. This checks module sharing in this repo's dependency graph; it does not qualify an
+independently installed tarball or Finance's graph. Focused packed Finance adoption remains next.

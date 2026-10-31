@@ -18,3 +18,7 @@ export {
 export { AccountRecovery } from 'delightful-local-first/recovery'
 export { createRecoveryMessages } from 'delightful-local-first/recovery/messages'
 export type { RecoveryMessages } from 'delightful-local-first/recovery/messages'
+
+export { default as RecoveryPhrase } from 'delightful-local-first/recovery/svelte'
+export { createJazzRecoveryAdapter } from 'delightful-local-first/backend/jazz/recovery'
+export type { RecoveryScopeSource } from 'delightful-local-first/recovery/contracts'

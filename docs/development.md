@@ -13,10 +13,11 @@ Install with `pnpm install --frozen-lockfile`, then run `pnpm verify` for the CI
 - `pnpm format:check`: repository Oxfmt formatting.
 - `pnpm lint`: Oxlint correctness, no explicit any/casts, and import-boundary restrictions.
 - `pnpm check`: strict Svelte diagnostics and TypeScript/JavaScript checks, including configs.
-- `pnpm test:unit --run`: approved recovery machine scenarios using real actors and synthetic data.
+- `pnpm test:unit --run`: approved workflow, localization, adapter, and SSR scenarios.
 - `pnpm package`: generate `dist` JavaScript/declarations with svelte-package and run strict publint.
 - `pnpm check:consumer`: after packaging, resolve declarations with NodeNext, import non-UI ESM,
-  and bundle the public view with Svelte-aware Vite. No source path mapping is used.
+  exercise an isolated host-issued Jazz handle, and bundle public components with Svelte-aware Vite.
+  No source path mapping is used.
 - `pnpm build-storybook`: static documentation build.
 
 The consumer fixture checks root and recovery subpath imports using package self-reference and
@@ -47,8 +48,8 @@ correctness. No-switch enforcement remains a review rule, not a claim made by th
 | `fixtures/package-consumer/` | Built public-package resolution checks, not library source                                             |
 
 Oxlint checks static imports/re-exports and literal dynamic imports, including type imports. The
-Finance package/path names are prohibited throughout the repo. The only Jazz exception is the
-backend directory, and pure components additionally reject actor packages and orchestration paths.
+Finance package/path names are prohibited throughout the repo. Library Jazz imports are restricted to the
+backend directory; the isolated package-consumer Jazz host fixture has a narrow exception, and pure components additionally reject actor packages and orchestration paths.
 Types needed by views should be exposed through focused actor-free contracts rather than machine
 files. New aliases and barrel re-exports must preserve these boundaries during review: this is
 specifier-based enforcement, not a transitive dependency graph analysis. Computed dynamic imports
@@ -56,14 +57,16 @@ are outside the check and must not be used to bypass it.
 
 The directory names establish tooling conventions, not a settled runtime design or permission to
 implement it. The [recovery plan](../specs/001-local-first-foundation/plan.md) defines the first slice;
-SDK integration and host-owned lifecycle behavior remain future implementation work.
+the owned recovery integration and Jazz adapter implement its next boundary. Finance adoption remains separate.
 
 ## Unit coverage and review
 
 `pnpm test:unit` starts Vitest in watch mode; use `pnpm test:unit --run` for a single run.
-The dedicated Node-only configuration discovers machine and localization tests and does not load SvelteKit or a
-Storybook Vite configuration. Tests are type-checked with the source and run in CI after static checks.
-No Jazz server, user data, browser, or credential is used by the unit suite.
+The dedicated Node configuration discovers machine, localization, adapter, and SSR tests. It uses
+Svelte and SVG transforms to render real DUI components, without loading SvelteKit or Storybook.
+The consumer and Storybook builds use the same SVG transform required by DUI imports. Tests are
+type-checked with the source and run in CI after static checks. Adapter tests create disposable
+SDK credentials in an in-memory store; no Jazz server, user data, or real account is used.
 
 `pnpm test:storybook` runs the synthetic Chromium recovery scenarios after `pnpm build-storybook`.
 See [recovery presentation](recovery-view.md#running-focused-coverage) for browser installation,
@@ -73,7 +76,8 @@ known-server reuse, and alternate ports. CI builds the static stories and runs t
 The recovery suite covers acknowledgement/dismissal, observed and unobserved scope changes,
 A → B → A correlation, delayed resolution/rejection after cancellation, guarded retries, and
 terminal cleanup. Tests use real actors and the public view selector; synthetic values are safe
-in assertions. Actual SDK/UI/artifact-handling coverage belongs to later reviewed implementations.
+in assertions. Adapter and owned-composition coverage is described in [recovery integration](recovery-integration.md#coverage-and-next-adoption).
+Packed Finance adoption remains a later review cycle.
 Implementation must be reviewed and approved before its tests are added or run; acceptance of the
 contracts/workflow cycle authorized this initial coverage, not tests for unbuilt later slices.
 

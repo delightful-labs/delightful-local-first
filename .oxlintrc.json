@@ -80,6 +80,22 @@
 					}
 				]
 			}
+		},
+		{
+			"files": ["fixtures/package-consumer/jazz.js"],
+			"rules": {
+				"no-restricted-imports": [
+					"error",
+					{
+						"patterns": [
+							{
+								"regex": "(^|/)(delightful-finances|delightful-finance|finance)(/|$)|^[$#]finance(/|$)",
+								"message": "Finance domain code belongs to the consumer, never this shared library."
+							}
+						]
+					}
+				]
+			}
 		}
 	]
 }
