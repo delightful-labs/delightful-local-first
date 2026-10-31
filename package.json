@@ -78,6 +78,18 @@
 		"./backend/jazz/recovery": {
 			"types": "./dist/backend/jazz/recovery-phrase.d.ts",
 			"default": "./dist/backend/jazz/recovery-phrase.js"
+		},
+		"./restoration/contracts": {
+			"types": "./dist/contracts/restoration.d.ts",
+			"default": "./dist/contracts/restoration.js"
+		},
+		"./restoration/workflow": {
+			"types": "./dist/machines/identity/restoration.d.ts",
+			"default": "./dist/machines/identity/restoration.js"
+		},
+		"./backend/jazz/restoration": {
+			"types": "./dist/backend/jazz/restoration.d.ts",
+			"default": "./dist/backend/jazz/restoration.js"
 		}
 	},
 	"svelte": "./dist/index.js",

@@ -2,7 +2,7 @@
 
 Shared local-first app foundation using Jazz for v1, informed by Delightful Finance and Delightful UI. Focused SDK boundaries leave room for future backend replacement.
 
-This repository contains the MVP specification, developer tooling, and the initial recovery workflow. It also includes a localized pure recovery view with synthetic Storybook examples. The owned Svelte integration and Jazz adapter are implemented for review; the full demonstration app and Finance adoption remain future work.
+This repository contains the MVP specification, developer tooling, and the initial recovery workflow. It also includes a localized pure recovery view with synthetic Storybook examples. The owned Svelte integration and Jazz adapter are implemented and covered. Finance adoption is locally verified in PR #35 and awaits CI/merge; the full demonstration app remains future work.
 
 - [Foundation specification](specs/001-local-first-foundation/spec.md)
 - [Specification quality checklist](specs/001-local-first-foundation/checklists/requirements.md)
@@ -35,10 +35,10 @@ See [developer tooling](docs/development.md) for import boundaries, editor setup
 and dependency update/PR conventions. The root package entry remains empty; recovery uses separate exports.
 
 The recovery workflow uses XState; its presentation uses DUI with library-owned Paraglide messages.
-The Jazz adapter and owned recovery composition are implemented for review. SvelteKit hosting and
-consumer adoption remain later work.
-Current unit coverage uses synthetic recovery data; the implementation-review gate still applies to
-new behavior and its tests. Synthetic Chromium coverage is available through `pnpm test:storybook` after building Storybook.
+The Jazz adapter and owned recovery composition have unit, SSR, package-consumer, and synthetic
+browser coverage. Finance PR #35 locally qualifies the packed snapshot against its existing session.
+SvelteKit hosting remains later work; the implementation-review gate still applies to new behavior
+and its tests. Synthetic Chromium coverage is available through `pnpm test:storybook` after building Storybook.
 
 ## Storybook and Netlify
 
@@ -61,12 +61,14 @@ runs are cancelled. No deployment secrets are required. Branch protection and re
 configured separately after the workflow is available remotely.
 
 New unit/browser coverage is added only after implementation review. Current unit coverage verifies
-the recovery workflow and localization; browser coverage checks the synthetic recovery UI. Jazz
-adapter and owned integration coverage remain pending review and runtime qualification. A separate workflow checks Conventional
+the recovery workflow, localization, Jazz adapter, and SSR boundary; browser coverage checks the
+synthetic recovery UI and owned integration. A separate workflow checks Conventional
 Commits PR titles.
 
 See [recovery presentation and localization](docs/recovery-view.md) for public imports, message
 overrides, catalog editing, and the current review/verification limits.
 
 See [owned recovery integration](docs/recovery-integration.md) for host scope observations,
-actor lifetime, Jazz module sharing, and the pending adapter/integration coverage.
+actor lifetime, Jazz module sharing, and adapter/integration coverage.
+
+The next design review is [identity restoration](specs/001-local-first-foundation/restoration/plan.md), preserving host-owned workspace draining and navigation.

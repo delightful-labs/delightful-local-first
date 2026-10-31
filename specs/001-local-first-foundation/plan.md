@@ -123,3 +123,15 @@ coverage must still be verified during implementation; source inspection is not 
 The real Finance integration is required before interface stabilization, not performed now.
 Workspace/record/transaction contracts remain future design work; the old multi-backend contracts
 must not fill those gaps implicitly. Generate tasks only after this plan has been reviewed.
+
+## Progress and next review
+
+The recovery reveal implementation and approved coverage are merged into library main through
+`42d001c`. The UI uses a single Close action without acknowledgement. Earlier acknowledgement
+references above describe the original plan; the current view contract and adoption notes govern
+shipped presentation. The advanced workflow's legacy confirmation states are not part of the UI.
+Finance adoption is PR #35 (`ce82dd4`), locally verified and awaiting its own CI/merge.
+
+The next focused proposal is [identity restoration](restoration/plan.md): a reusable invoked
+restoration child while Finance retains workspace draining, application lifetime, and navigation.
+This is a design review boundary, not permission to bypass implementation/test review.
