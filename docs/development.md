@@ -1,7 +1,8 @@
 # Developer tooling
 
-This setup validates build and package infrastructure. The package entry point is intentionally
-empty; it implements no foundation API. No Jazz, XState, DUI, or consumer migration is introduced.
+The tooling validates build/package infrastructure and the initial recovery workflow. The root
+entry point remains empty; recovery contracts and workflow have separate public exports. XState
+is an optional peer used by the workflow entry. No Jazz, DUI, or consumer migration is introduced.
 The package remains private and no release/publish workflow is configured.
 
 ## Static checks
@@ -12,19 +13,25 @@ Install with `pnpm install --frozen-lockfile`, then run `pnpm verify` for the CI
 - `pnpm format:check`: repository Oxfmt formatting.
 - `pnpm lint`: Oxlint correctness, no explicit any/casts, and import-boundary restrictions.
 - `pnpm check`: strict Svelte diagnostics and TypeScript/JavaScript checks, including configs.
+- `pnpm test:unit --run`: approved recovery machine scenarios using real actors and synthetic data.
 - `pnpm package`: generate `dist` JavaScript/declarations with svelte-package and run strict publint.
 - `pnpm check:consumer`: after packaging, resolve declarations with NodeNext and import built ESM
   through the public package name. No source path mapping is used.
 - `pnpm build-storybook`: static documentation build.
 
-The consumer fixture uses package self-reference and generated `dist` exports. It catches missing
+The consumer fixture checks root and recovery subpath imports using package self-reference and
+generated `dist` exports. It catches missing
 entry points and declaration resolution problems; it is not yet an isolated installed-tarball or
 component rendering check. Publint separately inspects package metadata and publishable files.
 Extend the fixture to real public APIs in the focused implementation that introduces those APIs.
 
 TypeScript is strict with unchecked indexed access and exact optional properties. Dependency type
 internals are skipped in the main check; owned files are checked. The package consumer enables
-dependency declaration checking so broken emitted type references are not hidden. Svelte diagnostics fail on warnings. Oxlint does not
+dependency declaration checking so broken emitted type references are not hidden. Its
+`exactOptionalPropertyTypes` is explicitly disabled: XState 5.33.2 has an upstream `setup.d.ts`
+`StateSchema.id` constraint error when that option and dependency declaration checking are both
+enabled. Library source retains exact optional checking with dependency internals skipped. This
+fixture therefore qualifies the documented consumer configuration, not every stricter combination. Svelte diagnostics fail on warnings. Oxlint does not
 provide full Svelte template linting; compiler diagnostics and type checks complement its script
 checks. Machine ownership and cleanup still need review; static checks cannot establish runtime
 correctness. No-switch enforcement remains a review rule, not a claim made by this lint configuration.
@@ -48,8 +55,22 @@ specifier-based enforcement, not a transitive dependency graph analysis. Compute
 are outside the check and must not be used to bypass it.
 
 The directory names establish tooling conventions, not a settled runtime design or permission to
-implement it. Host-owned resources and independently adoptable entry points still require the
-revised technical plan.
+implement it. The [recovery plan](../specs/001-local-first-foundation/plan.md) defines the first slice;
+SDK integration and host-owned lifecycle behavior remain future implementation work.
+
+## Unit coverage and review
+
+`pnpm test:unit` starts Vitest in watch mode; use `pnpm test:unit --run` for a single run.
+The dedicated Node-only configuration discovers machine tests and does not load SvelteKit or a
+Storybook Vite configuration. Tests are type-checked with the source and run in CI after static checks.
+No Jazz server, user data, browser, or credential is used by this suite.
+
+The recovery suite covers acknowledgement/dismissal, observed and unobserved scope changes,
+A → B → A correlation, delayed resolution/rejection after cancellation, guarded retries, and
+terminal cleanup. Tests use real actors and the public view selector; synthetic values are safe
+in assertions. Actual SDK/UI/artifact-handling coverage belongs to later reviewed implementations.
+Implementation must be reviewed and approved before its tests are added or run; acceptance of the
+contracts/workflow cycle authorized this initial coverage, not tests for unbuilt later slices.
 
 ## Editor setup
 

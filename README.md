@@ -2,12 +2,12 @@
 
 Shared local-first app foundation using Jazz for v1, informed by Delightful Finance and Delightful UI. Focused SDK boundaries leave room for future backend replacement.
 
-This repository contains the MVP specification and developer tooling. No foundation library, adapters, demonstration app, or tests have been implemented.
+This repository contains the MVP specification, developer tooling, and the initial recovery workflow. Shared UI, a Jazz adapter, the demonstration app, and Finance adoption remain future work.
 
 - [Foundation specification](specs/001-local-first-foundation/spec.md)
 - [Specification quality checklist](specs/001-local-first-foundation/checklists/requirements.md)
 
-The next step is a revised technical plan for the Jazz-first MVP and incremental adoption in Finance. A second backend, portable schemas, and independent plugins are deferred.
+The [recovery first-slice plan](specs/001-local-first-foundation/plan.md) guides incremental adoption in Finance. A second backend, portable schemas, and independent plugins are deferred.
 
 ## Spec Kit
 
@@ -15,7 +15,7 @@ The repository is bootstrapped from the existing local Spec Kit 1.1.3 scaffold b
 
 The [project constitution](.specify/memory/constitution.md) is adopted, with governance adapted from Finance and explicit backend integration boundaries.
 
-Use the local Spec Kit skills to refine requirements and prepare the revised technical plan. The old multi-backend plan is superseded.
+Use the local Spec Kit skills for later focused planning. The recovery plan replaces the old multi-backend design for this slice.
 
 ## Tooling
 
@@ -29,12 +29,15 @@ Inherited Spec Kit scripts, templates, and skills are excluded from formatting a
 
 `pnpm check` runs strict Svelte and TypeScript checks. `pnpm package` builds the private package
 and validates it with publint; run `pnpm check:consumer` afterwards to check built public exports.
-`pnpm verify` runs all static, package, consumer, and Storybook checks in CI order.
+`pnpm test:unit --run` runs the approved machine unit coverage.
+`pnpm verify` runs static checks, unit tests, packaging, consumer checks, and Storybook in CI order.
 See [developer tooling](docs/development.md) for import boundaries, editor setup, limitations,
-and dependency update/PR conventions. The package entry point remains empty pending implementation.
+and dependency update/PR conventions. The root package entry remains empty; recovery uses separate exports.
 
-XState, SvelteKit, Jazz, DUI, and application behavior remain separately scoped implementation work.
-No application tests are configured; the existing implementation-review gate still applies.
+The recovery workflow uses XState. SvelteKit hosting, Jazz integration, DUI compositions, and
+consumer adoption remain separately scoped implementation work.
+Current unit coverage uses synthetic recovery data; the implementation-review gate still applies to
+new behavior and its tests. No browser suite is configured yet.
 
 ## Storybook and Netlify
 
@@ -52,9 +55,10 @@ Netlify site is a separate hosting action; no site is created or published by th
 ## GitHub CI
 
 The `CI` workflow runs on pull requests, pushes to `main`, and manual dispatch. It installs the frozen
-lockfile, checks formatting, lint and types, validates the package and consumer fixture, then builds Storybook. Permissions are read-only and superseded
+lockfile, checks formatting, lint and types, runs unit coverage, validates the package and consumer fixture, then builds Storybook. Permissions are read-only and superseded
 runs are cancelled. No deployment secrets are required. Branch protection and required checks must be
 configured separately after the workflow is available remotely.
 
-Unit/browser tests will be added with their reviewed implementations. Current static/build checks
-do not verify foundation runtime behavior. A separate workflow checks Conventional Commits PR titles.
+New unit/browser coverage is added only after implementation review. Current unit coverage verifies
+the recovery workflow, not Jazz integration or UI behavior. A separate workflow checks Conventional
+Commits PR titles.

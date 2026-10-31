@@ -2,3 +2,15 @@
 import * as foundation from 'delightful-local-first'
 
 export const publicEntryPoint: object = foundation
+
+export type {
+	AvailableRecoveryScope,
+	RecoveryScope,
+	RecoveryPhraseCapability,
+	RecoveryPhraseEvent,
+	RecoveryPhraseView
+} from 'delightful-local-first/recovery'
+export {
+	createRecoveryPhraseMachine,
+	selectRecoveryPhraseView
+} from 'delightful-local-first/recovery/workflow'

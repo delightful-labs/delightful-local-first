@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Static checks, package, consumer, and Storybook
+    name: Checks, unit tests, package, and Storybook
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -29,6 +29,7 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm check
+      - run: pnpm test:unit --run
       - run: pnpm package
       - run: pnpm check:consumer
       - run: pnpm build-storybook

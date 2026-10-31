@@ -24,7 +24,8 @@
 		"stories/**/*.ts",
 		"stories/**/*.js",
 		"stories/**/*.svelte",
-		"svelte.config.js"
+		"svelte.config.js",
+		"vitest.config.ts"
 	],
 	"exclude": ["node_modules", "dist", "storybook-static", ".netlify", ".svelte-kit"]
 }

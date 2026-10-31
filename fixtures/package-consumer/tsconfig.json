@@ -4,7 +4,8 @@
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"types": [],
-		"skipLibCheck": false
+		"skipLibCheck": false,
+		"exactOptionalPropertyTypes": false
 	},
 	"include": ["./consumer.ts", "./import.js"],
 	"exclude": []
