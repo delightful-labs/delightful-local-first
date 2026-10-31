@@ -8,3 +8,5 @@ import './jazz.js'
 import 'delightful-local-first/restoration/contracts'
 import 'delightful-local-first/restoration/workflow'
 import 'delightful-local-first/backend/jazz/restoration'
+
+import './session.js'

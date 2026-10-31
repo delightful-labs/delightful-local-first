@@ -71,4 +71,4 @@ overrides, catalog editing, and the current review/verification limits.
 See [owned recovery integration](docs/recovery-integration.md) for host scope observations,
 actor lifetime, Jazz module sharing, and adapter/integration coverage.
 
-The next design review is [identity restoration](specs/001-local-first-foundation/restoration/plan.md), preserving host-owned workspace draining and navigation.
+Identity restoration is implemented and merged, with Finance retaining workspace draining and navigation. The next design review is [session startup and resume](specs/001-local-first-foundation/startup/plan.md), separating shared acquisition from application attachment.
