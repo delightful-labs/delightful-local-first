@@ -1,8 +1,9 @@
 # Workspace lifecycle: selection, then private creation
 
-Status: selection implementation reviewed; approved library coverage and package checks pass. No Finance
-adoption, schema, catalog, archive, private-creation, or implementation-test changes. Baselines: library main `9372e0a` (PR #4), Finance main `f83be67`
-(PR #39, including CI fixture correction `75b7376`). Both branches: `plan/workspace-lifecycle`.
+Status: selection and Finance handoff are implemented; final pending-write and cold-start
+qualification is in progress. Private creation, schema/catalog changes, invitations and generic data
+operations are outside this slice. Baselines: library main `9372e0a` (PR #4), Finance main `f83be67`
+(PR #39). Both feature branches: `plan/workspace-lifecycle`.
 
 ## Scope and delivery order
 
@@ -129,7 +130,8 @@ does not certify cancellation.
 
 ## First Finance adoption seam
 
-Attach the shared selection actor to Finance's existing workspace coordinator. The integration keeps
+Host the shared selection attachment under Finance's existing application coordinator, above the
+workspace tree it must drain; the workspace coordinator consumes the shared verdict. The integration keeps
 its existing directory/membership queries and maps observed facts; Finance still owns initialization,
 bank/transfer cleanup, integrity, schema access, URLs, transaction route resolution, and navigation.
 Replace the selected-scope decision only, not the entire workspace tree. Inventory the existing
@@ -278,6 +280,48 @@ strict publint, and diff checks pass.
 These checks qualify the synthetic selection protocol only. They do not prove real subscription
 binding, Finance resource-drain integration, Jazz authorization, or storage durability. No Finance
 file, browser server, dependency version, archive, catalog, schema, or user data changed in this cycle.
-The implementation and coverage remain uncommitted. Next review: map this protocol into Finance's
-existing coordinator, identify the exact resource owner/ack path, and propose its focused adoption.
+The implementation and coverage are committed as `390902e`. The Finance mapping is now documented
+in its `docs/local-first-workspace-selection-plan.md` on `plan/workspace-lifecycle`.
 Private creation remains a separate later design.
+
+## Finance adoption mapping
+
+Finance's application root, rather than its workspace subtree, supervises selection so the selection
+actor can survive the resources it asks to drain. A fixed-bound library actor needs a Finance-owned
+attachment lifetime for client/identity replacement. Finance has implemented and verified that
+attachment plus scoped transfer drain, and refreshed its vendored library archive. Application
+selection wiring is now integrated and verified in Finance's working branch.
+
+Ordinary selection changes must preserve identity-bound startup, creation, and route navigation.
+Whole workspace closure shuts down creation. WORKSPACE_CLOSED is a terminal-entry notice, not finite
+completion proof; the application waits for the coordinator's actual correlated onDone output for
+identity/session replacement and application shutdown. The
+selected-resource lifetime covers bank (including retention) and integrity. Its finite result and the
+application transfer owner's exact scoped acknowledgement must both match the issued drain before
+DRAINED. Finance now exposes finite released/releasedWithFailure/unresolved outputs from bank,
+retention, and integrity, preserving earlier uncertainty across later success. Finance also has a
+reviewed and verified selected-resource owner for bank and integrity, with both completion orders
+and failure/late-message coverage. The production coordinator migration now uses this selected-resource owner while preserving
+startup/creation/navigation. That migration is reviewed and verified with 246 focused unit cases,
+12 focused browser scenarios, and clean type/format checks. It also preserves drafts on equivalent
+editing observations and rejects late integrity forwarding after drain begins.
+Shared selection and application transfer-drain correlation are now integrated. The coordinator
+consumes library leases; directory availability does not gate exact local membership or ordinary
+transfer usability. Transfer requests capture original scope before submission, with an application-
+lifetime generation across attachment replacement. A finite join waits for selected-resource and
+transfer evidence before the application acknowledges the exact library drain. Already-completed
+owners contribute their actual finite evidence at join creation, avoiding messages to a completed
+join. Unknown cleanup cannot authorize another SDK identity change or clean shutdown.
+
+The handoff is verified with 191 distinct focused Finance unit cases and a final passing 16-scenario
+browser run covering recovery/sign-in, bank cancellation/retention, selector/filter/revocation,
+creation through a selection change, readiness/reload, offline and cross-currency transfer creation,
+and transfer link/unlink/delete. Source/service-worker and browser-test types and formatting pass;
+the final server log contains no stopped-actor warnings. Finance changes remain uncommitted.
+This qualification does not claim a new cold-restart/nonanswering-remote or full PWA suite.
+
+Independent route-local actor teardown remains an explicit qualification limit, not an implicit
+guarantee of that acknowledgement. The detailed Finance design and verification notes live in
+`docs/local-first-workspace-selection-plan.md`; they separate reviewed prerequisites from the later
+application/observation adoption. No Finance domain behavior or resource ownership moves into the
+shared library as part of this mapping.

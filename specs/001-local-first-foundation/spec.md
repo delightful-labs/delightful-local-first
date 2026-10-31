@@ -3,7 +3,9 @@
 **Feature Branch**: `spec/jazz-only-mvp`
 **Created**: 2026-10-14
 **Updated**: 2026-10-31
-**Status**: Revised MVP draft for review; specification only, no implementation authorized.
+**Status**: Active Jazz-only MVP requirements. Identity/session slices and workspace selection have
+subsequently been authorized, implemented, and adopted incrementally; see [current progress](plan.md).
+The full MVP is not complete. This specification itself does not authorize additional unreviewed slices.
 
 **Input**: Deliver a reusable foundation for new Delightful apps using Jazz for v1, informed by current Finance and DUI. Put database SDK access behind focused layers so another backend can be introduced later without making multi-backend support a release prerequisite.
 
@@ -182,8 +184,8 @@ These are future acceptance criteria, not claims of verified foundation behavior
 
 ## Assumptions and Deferred Scope
 
-- This task updates specifications only. No foundation code, tests, consumer integrations/migrations, dependency updates, commits, or publishing are authorized. The focused Finance integration is a future validation requirement, not authorization to perform it now.
-- Jazz works as the current Finance backend; that is extraction evidence, not proof that a reusable foundation already exists or every SDK flow is qualified.
+- The original scope revision authorized specifications only. Later explicit instructions authorized the delivered identity/session and selection slices and their Finance integrations. New capabilities still require their own authorization; package publication and merging are not implied by implementation work.
+- Jazz works as the current Finance backend; that is extraction evidence, not proof that all foundation capabilities are implemented or every SDK flow is qualified.
 - Future replaceability means containing coupling and documenting mappings. It does not promise zero-cost migration, identical backend features, or a stable third-party plugin contract today.
 - Separate pairing protocols, additional authentication methods, DXOS qualification, independent backend packages, cross-backend conformance, and schema portability are later work.
 - Clipper revival, financial workflows, bank sync, credential encryption, image editing, generic file replication, and broad background preparation remain outside this MVP.

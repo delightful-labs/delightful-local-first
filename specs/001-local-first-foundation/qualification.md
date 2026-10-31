@@ -1,9 +1,8 @@
 # Backend Capability Evidence and Design Implications
 
-**Status**: Source review for design; no backend is runtime-qualified.
-**Scope**: This document records source evidence against the active requirements. It does not
-select a replacement backend or add a service. Generic read-only membership is not a foundation
-requirement.
+**Status**: Historical source evidence, not runtime qualification. Jazz alone is required for v1;
+DXOS and portable-schema comparison below are deferred research. Current capability-specific plans
+record executed Jazz/Finance checks. No second-backend qualification gate applies to the [active MVP](spec.md).
 
 ## Evidence Revisions
 

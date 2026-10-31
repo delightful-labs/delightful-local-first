@@ -1,12 +1,15 @@
-# Implementation Plan: Recovery Phrase First Slice
+# Implementation Plan: Jazz-First Foundation
 
-**Branch**: `plan/recovery-first-slice` | **Date**: 2026-10-31 | **Spec**: [spec.md](spec.md)
-**Status**: Proposed design for user review. No runtime implementation, dependency changes, consumer
-migration, or implementation tests are authorized by this planning change.
+**Current branch**: `plan/workspace-lifecycle` | **Spec**: [spec.md](spec.md)
+**Status**: Recovery, restoration, startup acquisition and acquired-session readiness are implemented
+and adopted in Finance. Shared workspace selection and its Finance handoff are implemented and
+under final slice qualification. The full Jazz-only MVP remains incomplete. Earlier planning steps
+below are historical; the current contract map and slice progress govern shipped behavior.
 
 ## Summary
 
-Start incremental adoption with recovery phrase reveal, acknowledgement, hide, and cleanup.
+Incremental adoption began with recovery phrase reveal, hide, and cleanup. The shipped view has one
+Close action and no saved-phrase acknowledgement checkbox.
 Extract Finance's workflow and DUI-based view behind typed, independently consumable interfaces.
 Finance keeps its existing Jazz provider/client, identity subscription, login/restore, navigation,
 workspace lifecycles, schemas, and permissions. A narrow Jazz adapter uses the host account handle;
@@ -117,12 +120,12 @@ included. The scoped verification guide records acceptance and artifact handling
 
 ## Open Work and Design Limits
 
-All consequential design choices for this slice have a concrete proposal in the linked artifacts.
-Actual compiled message output, package peer resolution, host UI behavior, and adapter/runtime
-coverage must still be verified during implementation; source inspection is not runtime proof.
-The real Finance integration is required before interface stabilization, not performed now.
-Workspace/record/transaction contracts remain future design work; the old multi-backend contracts
-must not fill those gaps implicitly. Generate tasks only after this plan has been reviewed.
+The [current contract map](contracts/foundation.md) replaces the retired portable-schema/plugin
+proposal. Jazz alone is required for v1; no second-backend conformance gate applies. Implemented
+capability plans and package exports govern recovery, restoration, session ownership and selection.
+Private creation is next, followed by workspace compositions/access administration and concrete
+consumer data operations. An independent minimal consumer and broader MVP qualification remain.
+Do not infer qualification of those unbuilt boundaries from Finance's focused adoption results.
 
 ## Progress and next review
 
@@ -160,6 +163,6 @@ The subsequent transfer fixture correction preserves the active workspace and ch
 invalidation; it passed three isolated cases with two workers. These are qualification results for
 those tested paths, not proof of complete workspace extraction or universal offline query coverage.
 
-The next proposed ownership design is [workspace lifecycle](workspaces/plan.md): selection/switching
-first, private creation next, then reusable compositions. Earlier first-slice proposals above are
+The [workspace lifecycle slice](workspaces/plan.md) now implements selection/switching and its
+Finance handoff. Private creation is the next implementation slice, then reusable compositions. Earlier first-slice proposals above are
 historical; current slice artifacts and shipped contracts govern implemented behavior.
