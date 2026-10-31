@@ -102,6 +102,10 @@
 		"./backend/jazz/session": {
 			"types": "./dist/backend/jazz/session.d.ts",
 			"default": "./dist/backend/jazz/session.js"
+		},
+		"./backend/jazz/session-readiness": {
+			"types": "./dist/backend/jazz/session-readiness.d.ts",
+			"default": "./dist/backend/jazz/session-readiness.js"
 		}
 	},
 	"svelte": "./dist/index.js",

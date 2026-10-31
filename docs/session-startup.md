@@ -112,7 +112,13 @@ for attach → release → remount on the same owner. The Jazz entry is imported
 opening it. No actual Jazz session, browser server, credentials, or user data are needed for this
 new fixture; existing recovery/restoration consumer checks keep their own isolated scope.
 
-Type checks, lint, formatting, package build, and publint pass. The public package consumer declaration, Node runtime, and Vite checks also pass. Runtime cold-start/local-availability claims still need
-the later real Finance adoption, including its protected authentication and cold proxy/offline checks.
-Finance startup/cache and readiness integration remain unchanged in this review cycle. No new UI,
-localization, schema, dependency version, or server lifecycle change is included.
+Type checks, lint, formatting, package build, and publint pass. The public package consumer declaration, Node runtime, and Vite checks also pass. Finance adoption is now merged in PR #38 (main `bf38397`), paired with library PR #3
+(main `7909ec2`). Its 62 focused unit tests, 11 authentication browser scenarios, full type checks,
+and two production cold-restart cases pass: an unanswered authority connection and fully offline
+local reads/saves/reloads. The stale debug diagnostic expectation was corrected and verified with
+debugging enabled and disabled. These qualify the tested local-availability paths, not all query
+shapes or final SDK disposal. Finance removed its cached startup promise and retired startup machine,
+while retaining its provider, workspace/domain coordination, status observation, and SDK retry.
+
+The next proposed ownership review is
+[acquired session readiness and retry](../specs/001-local-first-foundation/readiness/plan.md).

@@ -4,6 +4,7 @@ import { createJazzSessionAcquisition } from 'delightful-local-first/backend/jaz
 import {
 	createSessionAcquisitionMachine,
 	createSessionStartupMachine,
+	createSessionReadinessMachine,
 	selectAcquiredSession
 } from 'delightful-local-first/session/workflow'
 import 'delightful-local-first/session/contracts'
@@ -56,4 +57,54 @@ try {
 	second.stop()
 	reporter.stop()
 	owner.stop()
+}
+
+// Exercise acquired-session readiness through the built workflow and Jazz adapter entries.
+const { createJazzSessionReadinessAdapter } =
+	await import('delightful-local-first/backend/jazz/session-readiness')
+let retries = 0
+let released = 0
+const unused = async () => {}
+const readinessBinding = createJazzSessionReadinessAdapter({
+	getSnapshot: () => ({ status: 'ready' }),
+	subscribe: () => () => {
+		released += 1
+	},
+	retry: async () => {
+		retries += 1
+	},
+	createLocalFirst: unused,
+	restoreLocalFirst: unused,
+	becomeBackend: unused,
+	registerJWT: unused,
+	loginJWT: unused,
+	loginOrRegisterJWT: unused,
+	linkJWT: unused,
+	logout: unused,
+	close: unused
+})
+const readinessReporter = createActor(
+	fromTransition(
+		(count, event) =>
+			event.type === 'SESSION_STATUS' && 'afterRetry' in event && event.afterRetry === 1
+				? count + 1
+				: count,
+		0
+	)
+).start()
+const readiness = createActor(createSessionReadinessMachine(), {
+	input: { reportTo: readinessReporter }
+}).start()
+try {
+	const scope = { binding: readinessBinding.binding, attachment: {} }
+	readiness.send({ type: 'BIND', scope, capability: readinessBinding.capability })
+	readiness.send({ type: 'RETRY', scope, attempt: 1 })
+	await waitFor(readinessReporter, (snapshot) => snapshot.context === 1)
+	readiness.send({ type: 'SHUTDOWN' })
+	await waitFor(readiness, (snapshot) => snapshot.status === 'done')
+	if (retries !== 1 || released !== 1)
+		throw new Error('Packaged readiness did not settle and release')
+} finally {
+	readiness.stop()
+	readinessReporter.stop()
 }
