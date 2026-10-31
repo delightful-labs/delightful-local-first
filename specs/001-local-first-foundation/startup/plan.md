@@ -1,7 +1,8 @@
 # Session startup and resume: ownership design
 
-Status: initial library acquisition owner, attachment, contracts, adapter, and exports implemented
-for review. No new tests, dependency versions, strings, or Finance runtime changes.
+Status: initial library implementation committed as `a4518fb`; 31 focused tests pass.
+Coverage and the observer-failure release fix await review. No new dependency versions, strings,
+or Finance runtime changes.
 See [implementation notes](../../../docs/session-startup.md).
 Library branch: `plan/session-startup-resume`, from main `13ed26c`.
 Finance branch: `plan/shared-session-startup`, from main `4905793`.
@@ -184,7 +185,7 @@ new startup protocol must not remount an existing workspace just because another
    restart with unanswered authority and offline access through Finance's existing isolated wire-proxy
    setup if acquisition/initialization behavior changes. Existing local reads/saves must stay usable.
 
-No server, test, archive, SDK data, or Finance runtime file is changed in this implementation cycle.
-Pre-review checks cover types, lint, formatting, and package validation only. Full session status/lifecycle
+This approved coverage cycle adds focused tests and public-package consumer checks. No server,
+archive, SDK data, dependency versions, or Finance runtime file is changed. Full session status/lifecycle
 extraction, session disposal, new-app demonstration, workspace migration, and the full MVP remain
 later work.

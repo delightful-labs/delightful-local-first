@@ -16,7 +16,9 @@ export type SessionStartupEvent<Session extends object> =
 	| Readonly<{ type: 'START'; owner: SessionOwnerRef<Session>; scope: SessionScope }>
 	| Readonly<{ type: 'RETRY' | 'SHUTDOWN' }>
 	| SessionOwnerReply<Session>
-type Event<Session extends object> = SessionStartupEvent<Session> | { type: 'OWNER_FAILED' }
+type Event<Session extends object> =
+	| SessionStartupEvent<Session>
+	| { type: 'OWNER_FAILED' | 'OWNER_OBSERVER_FAILED' }
 type Context<Session extends object> = {
 	reportTo: SessionStartupInput<Session>['reportTo']
 	owner: SessionOwnerRef<Session> | undefined
@@ -47,7 +49,7 @@ export function createSessionStartupMachine<Session extends object>() {
 				})
 				return () => subscription.unsubscribe()
 			} catch {
-				sendBack({ type: 'OWNER_FAILED' })
+				sendBack({ type: 'OWNER_OBSERVER_FAILED' })
 				return undefined
 			}
 		})
@@ -190,7 +192,7 @@ export function createSessionStartupMachine<Session extends object>() {
 						{ guard: 'releasing', target: 'closed' },
 						{
 							target: 'ownerFailed',
-							actions: assign({ reason: (): SessionFailure => 'ownerFailed' })
+							actions: ['release', assign({ reason: (): SessionFailure => 'ownerFailed' })]
 						}
 					]
 				},
@@ -198,6 +200,10 @@ export function createSessionStartupMachine<Session extends object>() {
 					OWNER_FAILED: {
 						target: 'ownerFailed',
 						actions: assign({ reason: (): SessionFailure => 'ownerFailed' })
+					},
+					OWNER_OBSERVER_FAILED: {
+						target: 'ownerFailed',
+						actions: ['release', assign({ reason: (): SessionFailure => 'ownerFailed' })]
 					},
 					SHUTDOWN: '.releasing'
 				},
@@ -226,6 +232,7 @@ export function createSessionStartupMachine<Session extends object>() {
 						on: {
 							RELEASED: { guard: 'matchingReply', target: '#session-startup.closed' },
 							OWNER_FAILED: '#session-startup.closed',
+							OWNER_OBSERVER_FAILED: '#session-startup.closed',
 							SHUTDOWN: {}
 						}
 					}

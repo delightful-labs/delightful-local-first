@@ -1,7 +1,7 @@
 # Session acquisition and startup attachment
 
-Status: implementation for review. No new session tests have been added or run, and Finance's
-runtime is unchanged. See [the ownership design](../specs/001-local-first-foundation/startup/plan.md).
+Status: implementation committed as `a4518fb`; focused coverage and an observer-cleanup fix
+are prepared for review. Finance's runtime is unchanged. See [the ownership design](../specs/001-local-first-foundation/startup/plan.md).
 
 ## Entries and host wiring
 
@@ -63,7 +63,10 @@ reattach the closing child; stale scopes and duplicate START/RETRY events are ig
 
 The attachment invokes one public actor-lifecycle subscription while bound, including while waiting
 for release acknowledgement. Error/complete or subscription acquisition failure becomes OWNER_FAILED
-without raw error data. A public lifecycle-status check also detects owners already stopped before
+without raw error data. Observer acquisition/status-read failure is distinguished internally from
+confirmed owner death: it sends best-effort RELEASE so a live owner cannot retain an orphaned request,
+then reports ownerFailed without waiting for an unknown acknowledgement. A public lifecycle-status
+check also detects owners already stopped before
 subscription; XState 5.33 does not replay complete for a stopped snapshot. The subscription is
 removed when binding ends. Failure during release closes
 without awaiting a dead owner; ordinary owner failure reports once and accepts SHUTDOWN, without
@@ -89,16 +92,27 @@ include SDK-private partial setup; no returned handle exists for this library to
   It has no branch that chooses identities, bootstraps data, makes preflight requests, or retries.
   SDK internal orchestration remains owned by the SDK, not duplicated in library promise actors.
 
-## Review and next checks
+## Verification and next adoption
 
-Types, formatting, lint, package declarations, and publint are checked before review. They do not
-prove request ordering, interruption, SDK initialization behavior, or cold local availability.
-After approval add focused acquisition/attachment tests for shared/pending/supplied reuse, explicit
-retry across remounts, delayed success/failure after final release, stale scopes, duplicate/replayed
-retry, old release versus a newer generation, dead-owner release, subscription acquisition/cleanup,
-no-close/logout, and waiting SSR behavior. Validate the new public entries in the built consumer.
+31 focused tests pass: 27 acquisition/attachment protocol cases and four Jazz leaf adapter cases.
+They use real XState actors and typed recipients. They cover supplied/session/pending reuse,
+multiple attachments, duplicate starts/retries, explicit retry across remounts, delayed success and
+failure after final release, stale/foreign scope and recipient rejection, old release versus a newer
+generation, release-before-acquire, retired tokens, dead-owner release, observer acquisition/getter
+failure, subscription cleanup, and waiting without an owner before START. The observer-failure test
+found and verified the best-effort release fix described above; confirmed dead owners still require
+no acknowledgement.
 
-Only then adopt the packed library in Finance. Its existing startup/readiness fixtures must change
-to the public protocol before tests run; preserve restore and navigation regression coverage and
-qualify changed cold-start behavior using its disposable wire-proxy/offline harness. This slice
-adds no Finance archive, runtime, localization, schema, data, or server changes.
+The Jazz tests mock the public creation call: factory construction is lazy, configuration is captured,
+no initial identity/storage policy is invented, SDK rejection is not retried by the adapter, and a
+supplied reference bypasses creation. They do not qualify the real SDK session/client lifecycle.
+
+The built-package fixture resolves all new public declarations/imports and uses synthetic resources
+for attach → release → remount on the same owner. The Jazz entry is imported and constructed without
+opening it. No actual Jazz session, browser server, credentials, or user data are needed for this
+new fixture; existing recovery/restoration consumer checks keep their own isolated scope.
+
+Type checks, lint, formatting, package build, and publint pass. The public package consumer declaration, Node runtime, and Vite checks also pass. Runtime cold-start/local-availability claims still need
+the later real Finance adoption, including its protected authentication and cold proxy/offline checks.
+Finance startup/cache and readiness integration remain unchanged in this review cycle. No new UI,
+localization, schema, dependency version, or server lifecycle change is included.

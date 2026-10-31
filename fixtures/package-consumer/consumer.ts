@@ -37,3 +37,25 @@ export { createJazzRestorationAdapter } from 'delightful-local-first/backend/jaz
 
 export { restorationMachine } from 'delightful-local-first/restoration/workflow'
 export type { SuppliedRestorationInput } from 'delightful-local-first/restoration/workflow'
+
+export {
+	createSessionAcquisitionMachine,
+	createSessionStartupMachine,
+	selectAcquiredSession
+} from 'delightful-local-first/session/workflow'
+export type {
+	SessionOwnerEvent,
+	SessionOwnerInput,
+	SessionOwnerRef,
+	SessionStartupInput,
+	SessionStartupEvent
+} from 'delightful-local-first/session/workflow'
+export type {
+	SessionScope,
+	SessionFailure,
+	SessionOpenCapability,
+	SessionOwnerReply,
+	SessionStartupReport,
+	SessionStartupOutput
+} from 'delightful-local-first/session/contracts'
+export { createJazzSessionAcquisition } from 'delightful-local-first/backend/jazz/session'
