@@ -1,12 +1,10 @@
 # Session startup and resume: ownership design
 
-Status: initial library implementation committed as `a4518fb`; 31 focused tests pass.
-Coverage and the observer-failure release fix await review. No new dependency versions, strings,
-or Finance runtime changes.
+Status: implementation, approved coverage, and Finance adoption merged through library PR #3
+(main `7909ec2`) and Finance PR #38 (main `bf38397`). The source evidence and proposed protocol below
+record the design at that time; implementation notes describe the shipped boundary.
 See [implementation notes](../../../docs/session-startup.md).
-Library branch: `plan/session-startup-resume`, from main `13ed26c`.
-Finance branch: `plan/shared-session-startup`, from main `4905793`.
-Recovery PRs (library #2 and Finance #37) are merged; their existing behavior is the regression baseline.
+The next proposed slice is [acquired session readiness and retry](../readiness/plan.md).
 
 ## Scope and meaning
 

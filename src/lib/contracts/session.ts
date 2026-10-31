@@ -24,3 +24,47 @@ export type SessionStartupReport<Session extends object> =
 	| Readonly<{ type: 'SESSION_STARTUP_FAILED'; scope: SessionScope; reason: SessionFailure }>
 
 export type SessionStartupOutput = Readonly<{ outcome: 'closed' }>
+
+/** SDK status only: never a workspace permission, remote freshness, or retry-settlement claim. */
+export type SessionStatus = 'ready' | 'signed-out' | 'transitioning' | 'error' | 'closed'
+export type SessionReadinessScope = Readonly<{ binding: object; attachment: object }>
+export type SessionReadinessCapability = Readonly<{
+	readStatus: () => SessionStatus
+	subscribe: (notify: () => void) => () => void
+	retry: () => Promise<void>
+}>
+export type SessionReadinessBinding = Readonly<{
+	binding: object
+	capability: SessionReadinessCapability
+}>
+export type SessionObservationFailure = 'readFailed' | 'subscribeFailed' | 'observerFailed'
+export type SessionReadinessReport =
+	| Readonly<{
+			type: 'SESSION_STATUS'
+			scope: SessionReadinessScope
+			observation: number
+			status: SessionStatus
+			afterRetry: number | undefined
+	  }>
+	| Readonly<{
+			type: 'SESSION_OBSERVATION_FAILED'
+			scope: SessionReadinessScope
+			observation: number
+			reason: SessionObservationFailure
+	  }>
+	| Readonly<{
+			type: 'SESSION_OBSERVATION_CLEANUP_FAILED'
+			scope: SessionReadinessScope
+			observation: number
+	  }>
+	| Readonly<{
+			type: 'SESSION_RETRY_STARTED'
+			scope: SessionReadinessScope
+			attempt: number
+	  }>
+	| Readonly<{
+			type: 'SESSION_RETRY_SETTLED'
+			scope: SessionReadinessScope
+			attempt: number
+			outcome: 'resolved' | 'rejected'
+	  }>

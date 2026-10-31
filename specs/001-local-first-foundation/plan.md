@@ -133,12 +133,22 @@ shipped presentation. The advanced workflow's legacy confirmation states are not
 Finance recovery adoption PR #35 and restoration adoption PR #37 are merged.
 
 The subsequent [identity restoration slice](restoration/plan.md) is implemented and merged while
-Finance retains workspace draining, application lifetime, and navigation. The next design boundary
-is session startup, below; implementation/test review still applies.
+Finance retains workspace draining, application lifetime, and navigation.
 
 ## Session startup continuation
 
-Library restoration PR #2 and Finance adoption PR #37 are merged. The next ownership review is
-[session startup and resume](startup/plan.md), informed by Finance main `4905793`. Its acquisition
-owner survives application attachments; Finance keeps workspace cleanup and identity/navigation
-coordination. This plan does not authorize implementation tests before their implementation review.
+Library startup PR #3 and Finance adoption PR #38 are merged at library main `7909ec2` and Finance
+main `bf38397`. Acquisition ownership and per-application attachment are shared; SDK session status
+observation and acquired-session retry coordination remain Finance-owned.
+
+Approved verification passed: 31 library workflow/backend tests and package consumer checks;
+62 Finance readiness/runtime unit tests; 11 authentication browser scenarios; two production cold
+restart scenarios (unanswered authority and offline reads/saves); full source and browser-test types.
+The startup debug diagnostic fixture was subsequently corrected and passed with debugging both on
+and off. Finance's existing SDK provider, domain workflows, and workspace cleanup remain intact.
+
+The next proposed design is [acquired session readiness and retry](readiness/plan.md). It preserves
+Finance's pre-drain authorization and issued-operation retention while extracting observation and
+retry settlement. This documentation review does not authorize implementation tests or workspace
+migration. Earlier first-slice proposals above are historical; current slice artifacts and shipped
+contracts govern implemented behavior.
