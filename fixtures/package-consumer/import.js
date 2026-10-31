@@ -4,3 +4,7 @@ import 'delightful-local-first/recovery/contracts'
 import 'delightful-local-first/recovery/workflow'
 import 'delightful-local-first/recovery/messages'
 import './jazz.js'
+
+import 'delightful-local-first/restoration/contracts'
+import 'delightful-local-first/restoration/workflow'
+import 'delightful-local-first/backend/jazz/restoration'
