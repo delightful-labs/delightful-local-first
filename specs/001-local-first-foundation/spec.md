@@ -1,190 +1,202 @@
-# Feature Specification: Pluggable Local-First App Foundation
+# Feature Specification: Jazz-First Local-First MVP
 
-**Feature Branch**: Not created; initial specification on the repository's default branch.
-
+**Feature Branch**: `spec/jazz-only-mvp`
 **Created**: 2026-10-14
+**Updated**: 2026-10-31
+**Status**: Revised MVP draft for review; specification only, no implementation authorized.
 
-**Status**: Draft — requirements clarified for design review; backend feasibility and qualification remain unverified.
+**Input**: Deliver a reusable foundation for new Delightful apps using Jazz for v1, informed by current Finance and DUI. Put database SDK access behind focused layers so another backend can be introduced later without making multi-backend support a release prerequisite.
 
-**Input**: Create a shared foundation for Delightful apps, informed by Finance and Clipper, with independently maintained local-first backend plugins, identity/workspace behavior, Svelte bindings, and DUI-based dialogs/popovers. Specify only; do not implement or migrate either app.
+## Scope and Decisions
 
-## Clarifications
+This revision supersedes the October multi-backend MVP requirements. Jazz is the only required v1 backend. A useful foundation for building other apps is the release goal; a second backend, independent plugin distribution, a universal schema language, and cross-backend conformance are deferred.
 
-### Session 2026-10-14
+The approved direction of a shared data interface is retained as a modest typed boundary over concrete consumer operations. V1 does not require portable schema declarations or a general query language. App-owned Jazz schema and permission definitions may live in explicitly identified backend integration modules. Ordinary app workflows and presentation must use the foundation boundary rather than importing Jazz. Future replacement may require new schema mappings, policy definitions, and data migration; source-compatible replacement is not promised.
 
-- Q: Should apps use a shared data interface across backends, or keep backend-specific schemas and queries? → A: Use a shared data interface (Option A), with a deliberately modest first version. Apps own their domain schemas; the foundation defines their portable expression and supported queries, subscriptions, and mutations, which plugins translate. Begin with concrete consumer needs and validate against two real backends before stabilizing the contract. The initial operation set and transaction guarantees remain to be clarified.
-- Q: How much data querying should the first portable version support? → A: Practical baseline (Option B): typed records, explicit record-ID references, create/read/update/delete, equality and null checks, range filters, combined AND filters, field sorting, bounded result lists, and reactive observations. Related records use separate observations. Joins, aggregates, OR filters, pagination, and full-text search are deferred. Capabilities may be added later through versioned contract evolution and conformance checks; transaction guarantees remain a separate decision.
-- Q: When an operation changes several records, what must every qualified backend guarantee? → A: Transactions are explicit optional capabilities (Option B), separating atomic local multi-record persistence from authority-validated transactions. Apps requiring either capability must reject plugins lacking it. Subscription visibility must be documented separately; local atomicity does not imply atomic remote observation or preservation of business invariants under concurrent offline changes. The user approved treating both transaction guarantees as optional capabilities rather than mandatory v1 baseline behavior on 2026-10-15.
-- Q: Should users have separate identities for each Delightful app, or one identity they can use across apps? → A: Users may explicitly reuse one user identity across Delightful apps using the same backend. Shared identity does not by itself mean shared app data: app data stays organized in app-owned schemas/workspaces. The intended sharing model is an explicit workflow in which one app/workspace requests access to data from another app/workspace and the user approves or denies it; identity reuse alone grants no cross-workspace data access. This direction is confirmed by the user on 2026-10-15. The user decided on 2026-10-15 to defer the request-and-approval data-sharing flow from v1 until backend capabilities and portable authorization semantics are evaluated. V1 requires identity reuse and disclosure of backend-native access but does not promise cross-app data sharing. Before identity connection, the app must explain backend-specific identity authority and any native access that connecting grants. A future cross-app data-access request must explain the requested data and access before the user approves it. Private workspace data remains protected at the storage boundary; additional app-specific permission restrictions require explicit consumer approval before inclusion. Foundation-provided automatic single sign-on, a shared workspace directory, and identity portability between backend technologies remain outside v1. Cross-app data integration is not defined as a v1 requirement; backend-native discovery/access may exist and must be documented rather than assumed portable.
+Earlier decisions on explicit identity reuse, backend access disclosure, private workspaces, and optional transaction guarantees remain. Recovery and using the same identity on a second device remain required; v1 can satisfy second-device use through supported recovery rather than requiring an additional pairing protocol.
 
-## User Scenarios & Testing _(mandatory)_
+Incremental adoption is a v1 requirement. Existing apps may adopt individual compositions and
+workflow/data boundaries while retaining their other infrastructure. Finance must not require a
+whole-app rewrite, schema replacement, or data migration to start using the library. A focused
+Finance integration will validate this boundary before interfaces stabilize; implementing it still
+requires a separate instruction and the normal implementation review gate.
 
-### User Story 1 - Integrate an independently maintained backend (Priority: P1)
+## User Scenarios & Testing
 
-An app developer selects a backend plugin for a deployment. A plugin author can distribute and maintain that plugin independently, without modifying the foundation or making the foundation depend on every supported database.
+### User Story 1 - Start another app with reusable foundations (Priority: P1)
 
-**Why this priority**: Database replaceability and independent maintenance are the reason for creating this foundation.
+An app developer adds identity, workspace behavior, and typed reactive persistence without reproducing Finance's infrastructure or adopting Finance's domain model.
 
-**Independent Test**: Register a separately distributed plugin with a consumer demonstration and evaluate its compatibility and declared capabilities using the shared conformance suite.
-
-**Acceptance Scenarios**:
-
-1. **Given** a compatible independently distributed plugin, **When** a developer configures a deployment to use it, **Then** the foundation uses it without changes to foundation source code.
-2. **Given** a plugin with an incompatible contract version or a missing required capability, **When** the app initializes, **Then** it reports the incompatibility and prevents operations requiring that capability rather than weakening their guarantees.
-3. **Given** a plugin author, **When** they run the reusable conformance checks, **Then** they receive results distinguishing contract compliance from support for the capabilities required by a particular app.
-4. **Given** Jazz and a qualified second backend, **When** the same demonstration runs in two isolated instances, **Then** both satisfy the same agreed foundation scenarios with backend-native identity methods where appropriate.
-
-### User Story 2 - Establish and recover a local-first identity (Priority: P1)
-
-A user establishes an identity, resumes a session, recovers access, and links another device through reusable interactions provided by the foundation. Recovery and second-device linking are required foundation behaviors; each backend may provide its own flow. The user confirmed this scope on 2026-10-15.
-
-**Why this priority**: Reusable account behavior must work before protected app data and shared workspaces can be used.
-
-**Independent Test**: Exercise identity creation, session resumption, recovery, device linking, cancellation, and failure in a small consumer demonstration without Finance or Clipper domain data.
+**Independent Test**: A small consumer with one app-owned record type creates, observes, edits, and deletes workspace-scoped records through the foundation.
 
 **Acceptance Scenarios**:
 
-1. **Given** no active identity, **When** the user completes the selected backend's account flow, **Then** the app observes a usable identity and session or an actionable failure.
-2. **Given** an existing local session, **When** the app restarts, **Then** it resumes through explicit startup states without accidentally creating another identity.
-3. **Given** recovery or device linking is available, **When** the user completes the backend-native flow, **Then** they regain access to the intended identity and authorized workspaces.
-4. **Given** an interrupted or cancelled identity operation, **When** the interaction ends, **Then** transient sensitive information is cleared and the user can retry without a false success state.
-5. **Given** an identity established in one Delightful app, **When** the user explicitly connects another app using the same qualified backend, **Then** the existing identity is reused and the interaction explains the backend-native authority and workspace access granted by that connection.
-6. **Given** two apps connected to the same identity, **When** the backend grants that identity access to existing spaces, **Then** qualification records that access and the apps keep domain data organized without claiming an app security boundary. Access to private workspaces remains denied to unrelated identities at the storage boundary.
+1. **Given** a new consumer, **When** it configures Jazz through its integration boundary, **Then** it can use foundation identity/workspace flows and typed data operations without direct SDK calls in presentation or ordinary workflows.
+2. **Given** an app-specific schema or policy, **When** it is registered, **Then** its SDK dependencies remain in named integration modules and its domain rules remain consumer-owned.
+3. **Given** a future backend replacement, **When** a developer inventories dependencies, **Then** all direct SDK imports and backend-native contracts have documented integration owners; no claim of a proven replacement is made.
 
-### User Story 3 - Work privately and collaborate with controlled access (Priority: P1)
+### User Story 2 - Establish, resume, and recover identity (Priority: P1)
 
-A user has a private personal workspace and can create or join shared workspaces. A consumer app may add its own domain-specific restrictions only when explicitly approved; no Finance-specific restriction is required by this feature.
+A user starts with a local identity, resumes it after restart, protects recovery material, and explicitly restores the intended identity in another app or device.
 
-**Why this priority**: Users need private personal data and a way to collaborate in shared workspaces; backend membership models may differ.
-
-**Independent Test**: Use separate identities to demonstrate private workspace isolation and invited access to a shared workspace using the selected backend's documented membership model; generic read-only membership and app-specific domain restrictions are not required.
+**Independent Test**: Exercise new identity, returning session, recovery on separate browser storage, cancellation, invalid recovery material, and identity replacement.
 
 **Acceptance Scenarios**:
 
-1. **Given** a personal workspace, **When** an unrelated identity attempts access, **Then** it cannot read or write its protected data.
-2. **Given** a shared workspace invitation, **When** the intended recipient accepts it, **Then** they receive access according to the selected backend's documented membership model, which the foundation does not normalize into required read-only/read-write roles.
-3. **Given** one app is connected to a shared identity, **When** it attempts to access another app's data, **Then** the foundation does not promise portable cross-app data sharing in v1; backend-native access is documented, not assumed.
+1. **Given** a usable local session, **When** the app restarts while remote service is unavailable, **Then** available local work does not wait for remote freshness.
+2. **Given** a recovery interaction, **When** the user reveals or submits sensitive material, **Then** it is transient, absent from logs/URLs, and cleared on dismissal, unmount, cancellation, or identity replacement.
+3. **Given** an existing identity, **When** the user explicitly connects a second app or device through supported recovery, **Then** it restores that identity rather than silently replacing it. Identity restoration and remote data discovery have separate outcomes.
+4. **Given** identity reuse in another app, **When** connection is offered, **Then** the interaction discloses native credential authority and access consequences before confirmation. Separate app views are not described as security isolation.
+5. **Given** a failed or cancelled identity transition, **When** it settles, **Then** scoped resources are cleaned up and the user can retry without a false success or unintended repeated mutation.
 
-### User Story 4 - Observe local data and operation states (Priority: P2)
+### User Story 3 - Own and share workspaces (Priority: P1)
 
-An app developer defines domain schemas and accesses supported data through a shared interface translated by backend plugins, without backend-specific schemas, queries, or subscriptions in the portable app code. Users can distinguish startup, loading, empty results, ready data, and failures.
+A user creates a private workspace, selects among accessible workspaces, and explicitly invites another identity into a shared workspace.
 
-**Why this priority**: Portable data access and reusable reactive loading reduce backend coupling across apps; the first version must remain limited to agreed consumer needs.
-
-**Independent Test**: Run the same app-defined schemas, record operations, and baseline filtered/sorted/bounded observations through both qualified backends; restart offline and reconnect without changing portable consumer data code. Separately qualify any declared transaction capabilities and verify rejection when an app requires an unsupported capability.
-
-**Acceptance Scenarios**:
-
-1. **Given** a requested observation, **When** it loads, has no matching results, or fails, **Then** the app can distinguish those outcomes.
-2. **Given** an operation reported as locally durable, **When** the app restarts without a network connection, **Then** the acknowledged change remains available.
-3. **Given** observations owned by a consumer, **When** the consumer is disposed or changes session/workspace, **Then** its obsolete subscriptions are released and do not publish another identity's data.
-4. **Given** locally accepted changes and subsequent reconnection, **When** the backend synchronizes authorized data, **Then** the app can distinguish local success from synchronization status without treating network connectivity as proof of synchronization.
-5. **Given** app-defined schemas and data operations within the agreed portable capability set, **When** the demonstration runs with either qualified backend, **Then** its schema declarations and consumer data access code remain unchanged; deployment configuration selects the plugin. This does not migrate existing data or identities.
-6. **Given** typed records with ID references and a query combining workspace equality, a null check, a date range, field sorting, and a result bound, **When** records are created, updated, or deleted, **Then** the observation reflects the matching bounded results through both qualified backends. Related records can be observed separately without requiring joins.
-7. **Given** a plugin declaring atomic local multi-record persistence, **When** a grouped write fails or the app restarts offline after local durability is acknowledged, **Then** the persisted result contains all of the group's changes or none, never a partial group.
-8. **Given** an app requiring authority-validated transactions, **When** validation is unavailable or a concurrent conflict invalidates the operation, **Then** the operation remains explicitly pending or fails without reporting authority acceptance; an accepted operation meets the declared invariant-validation guarantee.
-9. **Given** an app requiring either transaction capability, **When** its selected plugin lacks that capability, **Then** qualification fails before dependent operations execute.
-
-### User Story 5 - Compose shared interactions without adopting full screens (Priority: P2)
-
-An app developer composes account/recovery, device-linking, and workspace-membership dialogs or popovers using the shared UI library, while retaining their own navigation, layout, screens, and domain workflows.
-
-**Why this priority**: Shared interactions should reduce repeated app code without imposing a complete application shell.
-
-**Independent Test**: Embed the interactions in a minimal consumer and exercise keyboard use, dismissal, translated content, state feedback, and backend-native flows.
+**Independent Test**: Use two authorized identities and an unrelated identity to exercise creation, selection, invitation, membership changes, and private-data denial.
 
 **Acceptance Scenarios**:
 
-1. **Given** a consumer using DUI, **When** it presents a foundation interaction, **Then** the interaction integrates with its screen without requiring foundation-owned routing or layout.
-2. **Given** loading, failure, cancellation, or completion, **When** the interaction changes state, **Then** it provides accessible feedback and appropriate focus behavior without duplicate announcements.
-3. **Given** a missing reusable UI primitive, **When** the interaction requirements are evaluated, **Then** a recommendation identifies the behavior, evidence, and proposed ownership rather than assuming an unavailable DUI API.
+1. **Given** a genuinely new identity, **When** it creates its first workspace offline, **Then** the workspace and required foundation records can persist locally without app-specific starter data becoming a readiness gate.
+2. **Given** a recovered identity with incomplete local records, **When** no workspaces are locally visible, **Then** the foundation does not automatically create replacements or restore access from absence alone; discovery proceeds independently of available work.
+3. **Given** an unrelated identity, **When** it requests private workspace records, **Then** storage authorization denies access regardless of UI visibility.
+4. **Given** an invitation, **When** it is accepted, rejected, expired, or already used, **Then** the interaction reports the actual outcome and documented Jazz membership semantics without duplicate membership.
+5. **Given** a workspace or observed access change, **When** current capabilities become invalid, **Then** affected work and subscriptions are invalidated and late results cannot expose the prior scope's data.
+
+### User Story 4 - Use local data with honest operation feedback (Priority: P1)
+
+A developer observes typed records and operation outcomes. Users keep working with available local records and locally known permissions while synchronization happens separately.
+
+**Independent Test**: Create and edit data offline, close every client, reopen offline, reconnect, and separately exercise incomplete replicas, silent remote service, and rejected or uncertain operations.
+
+**Acceptance Scenarios**:
+
+1. **Given** sufficient local records and permissions, **When** an ordinary read or write occurs with no remote answer, **Then** it completes on local evidence without a remote preflight or sync gate.
+2. **Given** a write reported as locally persisted, **When** every client closes and the prepared consumer restarts offline with retained storage, **Then** the change remains available.
+3. **Given** unavailable or partially replicated records, **When** an observation updates, **Then** it distinguishes loading, locally empty, locally ready, unavailable, and error without claiming global completeness.
+4. **Given** pending synchronization, rejection, or unknown settlement, **When** feedback is displayed, **Then** local acceptance, local persistence, connectivity, and remote acceptance remain distinct; unknown writes are not blindly replayed.
+5. **Given** session/workspace replacement or disposal, **When** an old observation reports late, **Then** it produces no consumer update in the new scope and its resources are released.
+
+### User Story 5 - Embed accessible shared interactions (Priority: P2)
+
+A developer embeds account/recovery and workspace interactions using DUI while retaining app routes, screens, layout, and localization.
+
+**Independent Test**: Embed the compositions in the small consumer and exercise keyboard operation, focus return, cancellation, translated messages, and operation feedback.
+
+**Acceptance Scenarios**:
+
+1. **Given** a consumer screen, **When** it renders foundation interactions, **Then** no foundation router, full app shell, Finance-specific page, or backend-aware presentation is required.
+2. **Given** a multi-step interaction, **When** state changes or the user dismisses it, **Then** focus, accessible feedback, cancellation, and sensitive-data cleanup remain coherent.
+3. **Given** existing DUI dialogs, inputs, status/loading controls, and button content, **When** compositions need those behaviors, **Then** they reuse available primitives. A genuinely missing primitive is documented for DUI review rather than duplicated.
+
+### User Story 6 - Adopt one capability in an existing app (Priority: P1)
+
+A Finance developer adopts one library capability, such as recovery presentation/workflow, while
+keeping the app's existing Jazz session, other workflows, financial schemas, and permissions.
+Further capabilities can migrate independently in later focused changes.
+
+**Independent Test**: Integrate one agreed capability into Finance through a narrow host adapter;
+exercise the adopted interaction and an existing unmigrated workflow against the same session,
+then verify dismissal, identity replacement, and resource cleanup.
+
+**Acceptance Scenarios**:
+
+1. **Given** Finance's existing Jazz session, **When** one library capability attaches, **Then** it
+   reuses that session through a documented adapter without creating a second identity, client,
+   workspace bootstrap, or competing lifecycle owner.
+2. **Given** partially migrated Finance, **When** library-backed and existing direct Jazz operations
+   run, **Then** they coexist with Finance's existing schemas and authorization. Unmigrated modules
+   need not adopt the library's data boundary as a prerequisite.
+3. **Given** host-owned session/workspace resources, **When** the adopted interaction unmounts,
+   **Then** it releases its own actors/subscriptions without shutting down host resources. Identity
+   replacement follows one explicit coordinated invalidation/drain protocol across the boundary.
+4. **Given** a focused adoption change, **When** it is reviewed or reverted, **Then** unrelated routes,
+   domain workflows, and persisted data do not require migration. Session, workspace, UI composition,
+   and data access adoption are not an all-or-nothing bundle.
+5. **Given** a proposed stable interface, **When** adoption evidence is reviewed, **Then** one small
+   Finance integration demonstrates the boundary; a minimal new consumer alone is insufficient proof
+   of incremental adoption. Full Finance migration remains outside the release requirement.
 
 ### Edge Cases
 
-- Backend startup fails, is cancelled, or is requested more than once.
-- Contract versions are incompatible or declared capabilities fail conformance checks.
-- A future explicitly approved app-specific restriction is unsupported by a selected plugin; qualification must identify the gap rather than imply enforcement.
-- A session/workspace changes while an observation or identity operation is pending.
-- The device is offline during identity establishment, recovery, or invitation acceptance; unsupported offline operations must not report success.
-- A local write fails before durability, or synchronization fails after local durability.
-- An invitation expires, is rejected, or is accepted repeatedly; outcomes must be explicit without duplicate memberships.
-- Workspace access changes while another device is offline. Qualification must document backend enforcement timing and revocation limits; it must not promise removal of data already disclosed.
-- Required guarantees such as atomic multi-record changes differ between backends; these differences remain visible during qualification.
-- Connecting another app may grant authority over spaces already accessible to the reused identity. The interaction must explain this consequence; app tags, separate views, and browser storage must not be presented as security isolation. Unauthorized identities must not access private workspaces; additional domain restrictions are in scope only if explicitly approved as consumer requirements.
+- New identity versus recovered identity with an empty or partial replica.
+- Remote service unreachable or connected but never answering.
+- Repeated startup, identity replacement, A → B → A workspace changes, and late reports.
+- Local persistence failure, later authority rejection, and unknown write outcome after interruption.
+- Offline invitation administration or recovery requiring unavailable remote data.
+- Revocation learned after offline work; already disclosed data cannot be promised erased.
+- Browser eviction, quota failure, unavailable runtime assets, and multiple tabs.
+- An SDK upgrade changing persistence, permissions, query behavior, or recovery semantics.
 
-## Requirements _(mandatory)_
+## Requirements
 
 ### Functional Requirements
 
-- **FR-001**: The foundation MUST accept all database backends through a public plugin contract; backend-specific dependencies MUST belong to plugins rather than being mandatory foundation dependencies.
-- **FR-002**: A plugin MUST be distributable and maintainable independently and usable without modifying foundation source code.
-- **FR-003**: The contract MUST be versioned and define compatibility, capability declaration, startup/shutdown, cleanup, and actionable failure behavior. Concrete interfaces are deferred to design.
-- **FR-004**: The foundation MUST validate compatibility and app-required capabilities before permitting dependent operations. Missing capabilities MUST NOT silently weaken authorization, durability, or other declared guarantees.
-- **FR-005**: Plugin authors MUST have reusable conformance checks that distinguish contract compliance from qualification against an app's required capability set.
-- **FR-006**: The foundation MUST support identity establishment, session lifecycle, recovery, and second-device linking, exposing their outcomes while permitting each backend to provide its native methods and interaction steps.
-- **FR-007**: The foundation MUST support private personal workspaces and invited shared workspaces with explicit membership managed according to the selected backend's documented model. Private workspace data MUST be inaccessible to unrelated identities at the storage boundary.
-- **FR-008**: Additional app-specific domain restrictions are outside the mandatory v1 foundation baseline. The foundation MAY support them through future design only when a consumer has an explicitly approved product requirement; any such restriction declared as required MUST be enforced at the backend/storage boundary, and UI filtering alone MUST NOT qualify. The foundation does not require generic read-only membership.
-- **FR-009**: The foundation MUST provide observable startup, loading, ready, empty, and error outcomes and release obsolete observations when consumers, sessions, or workspaces change.
-- **FR-010**: The foundation MUST define a shared data interface for app-owned domain schemas, queries, subscriptions, and mutations, translated by each backend plugin. Portable consumer data code MUST NOT require backend-specific schemas or APIs. The first version MUST be limited to concrete consumer needs and validated against two real backends before the contract is stabilized; it MUST NOT promise universal backend feature parity. FR-020 defines the mandatory data baseline; FR-022 defines optional transaction capabilities.
-- **FR-011**: For operations advertised as locally durable, acknowledged changes MUST survive an offline restart. Local durability and later synchronization outcomes MUST remain distinguishable.
-- **FR-012**: Users MUST be able to explicitly reuse one user identity across Delightful apps using the same qualified backend. Shared identity MUST NOT be represented as automatically sharing app data: each app owns its schemas/workspaces. V1 requires identity reuse without automatic cross-app data sharing. The user endorsed explicit app/workspace access requests with user approval as a future direction and deferred that workflow from v1 pending backend-capability evaluation. Plugins MUST document identity/account mapping, credential authority, native workspace/data discovery, and any access granted by identity reuse; the connection interaction MUST explain those consequences. Private workspaces MUST remain protected at the storage boundary. Foundation-provided automatic single sign-on, a shared workspace directory, and identity portability between backend technologies are outside v1. Backend-native discovery/access is documented but MUST NOT be implied portable.
-- **FR-013**: The foundation MUST offer Svelte bindings and DUI-based account/recovery, device-linking, and workspace-membership dialogs/popovers; consumer apps MUST retain ownership of full screens, routes, layouts, and domain workflows.
-- **FR-014**: Shared interactions MUST support keyboard operation, meaningful focus/dismissal behavior, consumer localization, and accessible operation feedback. Sensitive transient recovery/device information MUST be cleared when its interaction ends.
-- **FR-015**: The project MUST document recommended missing DUI primitives, informed by observed consumer needs and other local-first apps. Recommendations MUST distinguish generic presentation from foundation-owned identity/workspace behavior and MUST NOT imply implementation in this phase.
-- **FR-016**: Jazz and a real second backend MUST demonstrate the entire agreed required foundation capability set. A deterministic fake may support routine testing but MUST NOT substitute for the second real backend.
-- **FR-017**: The second backend MUST pass qualification for identity/recovery/device linking, explicit cross-app identity reuse with documented backend-native access consequences, private/shared workspace behavior, private workspace protection, reactive observations, local durability, synchronization, and the mandatory portable data baseline. Additional app-specific restrictions are excluded from baseline qualification unless separately approved as consumer requirements. DXOS is the first candidate, not a committed selection. Any deficiency against a mandatory foundation capability MUST block qualification or prompt an explicit scope decision.
-- **FR-018**: A deployment MUST select its plugin explicitly. Future validation MUST run the same consumer demonstration in two separate instances with separate ports and browser storage, each configured for one backend.
-- **FR-019**: Plugin qualification MUST document offline availability, failure semantics, permission-change timing, and relevant capability limits. Other plugins need not be created or maintained by this project.
-- **FR-020**: The mandatory v1 portable data baseline MUST support typed records, explicit record-ID references, create/read/update/delete, reactive observations, equality filters, null checks, range filters, combined AND filters, field sorting, and bounded result lists. Related records MUST be accessible through separate observations; portable joins are not required. A result bound MUST NOT imply pagination support.
-- **FR-021**: Portable joins, aggregates, OR filters, pagination, and full-text search are deferred from v1. Future capabilities MAY be added through explicit versioned contract evolution and conformance checks. Apps MUST declare any newly required capabilities, and plugins lacking them MUST fail qualification rather than silently approximate their behavior. Promoting an optional capability to mandatory MUST be an explicit compatibility decision.
-- **FR-022**: Multi-record transactions MUST be explicit optional capabilities, distinguishing (a) atomic local multi-record persistence, where a grouped write persists all changes or none and acknowledged local durability survives an offline restart, from (b) authority-validated transactions, where acceptance depends on validation of related reads and writes against concurrent conflicts at an authority. Authority unavailability MUST NOT be reported as acceptance. Neither capability implies the other. Apps MUST declare the capabilities they require; unsupported requirements MUST block qualification and dependent operations. Plugins MUST document subscription visibility separately, including whether other devices can observe partial groups; local atomicity MUST NOT imply atomic remote visibility or preservation of cross-record business invariants under concurrent offline changes. Each declared capability MUST have reusable conformance checks; the mandatory v1 baseline does not require either transaction capability.
+- **FR-001**: Jazz MUST be the sole required v1 database SDK. A second backend and backend marketplace/plugin ecosystem MUST NOT gate release.
+- **FR-002**: Database access MUST pass through focused typed boundaries for session/identity, workspaces/access, and app data observations/mutations. SDK imports, native handles, schema definitions, and policy definitions MUST remain in documented backend integration modules, not ordinary workflows or presentation.
+- **FR-003**: Consumers MUST own domain schemas and rules. V1 MUST cover typed records, explicit ID references, create/read/update/delete, and reactive workspace-scoped observations. Equality/null/range/AND filtering, sorting, and bounded lists remain the initial supported query needs; exact expression and execution limits require design against a concrete consumer. No universal schema/query compiler is required.
+- **FR-004**: Unsupported operations or guarantees MUST fail explicitly before dependent work. No wrapper may silently weaken authorization, durability, or transaction semantics.
+- **FR-005**: Identity establishment, local resumption, explicit recovery, second-device identity reuse, and session transition cleanup MUST be supported through documented Jazz mechanisms. Separate device invitation/QR pairing and passkey mechanisms are not independently required v1 features.
+- **FR-006**: Explicit same-backend identity reuse across apps MUST disclose credential authority and native data access. Automatic SSO, cross-backend identity portability, a shared app directory, and cross-app data request/approval workflows are deferred.
+- **FR-007**: Private and invited shared workspaces MUST enforce access at storage boundaries. Membership labels MUST reflect implemented Jazz policies. Finance's organization/account grants, viewer roles, and provider-secret rules MUST NOT become generic foundation requirements without separate approval.
+- **FR-008**: Workspace creation, selection, naming, invitation, and authorized membership changes MUST have explicit outcomes. Ordinary local work MUST remain independent of online-only access administration.
+- **FR-009**: Ordinary reads/writes MUST use available local data and locally known permissions without waiting for remote freshness. Observed identity, membership, grant, and workspace changes MUST invalidate scoped decisions.
+- **FR-010**: Local availability, completeness, persistence, connectivity, and remote acceptance MUST remain separate observations. Empty local results MUST NOT authorize automatic bootstrap, replacement, repair, or access restoration for a recovered identity.
+- **FR-011**: Advertised local durability MUST survive a cold offline restart with retained storage. Later rejection and unknown settlement MUST remain observable; preserve operation identity and recovery facts without blindly replaying uncertain writes.
+- **FR-012**: App-required atomic local persistence and authority-validated transactions MUST be explicit, separately supported guarantees. V1 need not offer both universally; consumers requiring an unavailable guarantee MUST be rejected. Subscription visibility and offline/concurrent limitations MUST be documented independently.
+- **FR-013**: Startup, scoped readiness, identity transitions, workspace transitions, and multi-step operations MUST use composed XState workflows. Model states, decisions, ownership, cancellation, partial outcomes, failure, retry, and cleanup before effects; promise actors perform leaf operations and MUST NOT hide orchestration in helpers or transaction callbacks.
+- **FR-014**: Integration components MUST own SDK subscriptions, dependency binding, and actor attachment/lifecycle. Pure presentation MUST receive typed data and callbacks and MUST NOT call SDKs or actors. Simple presentation state may remain local.
+- **FR-015**: Svelte 5 compositions MUST reuse DUI presentation and support consumer localization through the project's Paraglide direction, semantic controls, keyboard access, meaningful focus/dismissal, and nonduplicated status announcements. Consumers retain routes/layouts; no decorative visual redesign is approved.
+- **FR-016**: A minimal consumer with an app-owned record type MUST demonstrate the shared layers, identity/recovery, workspace access, reactive data, and offline behavior without Finance domain dependencies. Full Finance migration and a second product app are not v1 prerequisites; the focused adoption validation in FR-021 is required before interface stabilization.
+- **FR-017**: Preparation MUST NOT block already usable local work. The foundation MUST expose partial availability and configurable consumer acquisition needs without promising all records are downloaded. Consumer hosting owns service-worker assets/update consent; generic binary storage and a background acquisition engine are deferred.
+- **FR-018**: Before implementation, the revised plan MUST pin compatible SDK/UI/toolchain versions, define layer contracts and supported transaction/permission behavior, document SDK escape hatches, and identify relevant tests. Implementation tests MUST only be added/run after user review and approval of the implementation they cover.
 
-- **Key Entities** _(include if feature involves data)_
+- **FR-019**: Identity/session integration, workspace behavior, individual UI compositions, and data access MUST be independently adoptable through documented entry points and narrow typed adapters. An existing consumer MUST NOT need to replace its entire infrastructure, schemas, or permission model to adopt one capability. The revised plan MUST distinguish any genuinely required dependencies from optional compositions.
+- **FR-020**: The library MUST support attaching to a host-owned Jazz session through its backend integration boundary. Ownership of shared session/client and workspace lifecycle MUST be explicit and singular. Library-owned resources MUST have scoped cleanup; detaching an interaction MUST NOT stop host-owned resources. Scope changes and identity transitions MUST coordinate invalidation/drain without competing owners. Existing unmigrated SDK integrations MAY coexist during migration; FR-002 applies to the adopted boundary and newly library-backed workflows, not as a prerequisite rewrite of untouched consumer modules.
+- **FR-021**: Before public interfaces stabilize, one separately authorized, focused Finance integration MUST validate coexistence, existing-schema compatibility, session reuse, scoped cleanup, and identity-change coordination. The initial slice SHOULD be recovery presentation/workflow unless design review identifies a smaller representative boundary. Full Finance migration, financial-domain extraction, and data conversion MUST NOT be required. This specification update authorizes no Finance code changes.
 
-- **Backend plugin**: Independently maintained integration with a particular local-first backend, its compatibility version, and supported capabilities.
-- **Capability requirement**: A behavior or guarantee required by a consumer; determines whether a compatible plugin is suitable for that app.
-- **Identity and session**: A backend-managed user identity reusable by explicit connection across apps using the same backend, with backend-native credential authority and workspace access. A backend may assign separate app accounts to one identity; shared authority does not imply security isolation between apps.
-- **Workspace**: A personal or shared boundary for protected app data, independent of Finance's financial accounts.
-- **Membership and invitation**: Granted workspace access and the process by which another identity accepts access.
-- **Permission extension**: A possible future app-specific authorization restriction, included only after an explicit consumer product requirement is approved.
-- **Portable domain schema and data operation**: An app-owned typed record model with explicit record-ID references, and its baseline queries, subscriptions, and mutations expressed through the foundation's shared interface and translated by plugins; multi-record transactions are separately declared optional capabilities.
-- **Observation and operation outcome**: Consumer-visible data readiness, errors, durability, and synchronization information across qualified backend implementations.
+### Key Entities
 
-## Success Criteria _(mandatory)_
+- **Identity/session**: Local identity binding, explicit recovery/connection, and session lifetime.
+- **Workspace/membership/invitation**: Collaboration scope and storage-enforced access with native outcomes.
+- **App record/reference**: Consumer-owned typed domain data and explicit record identity.
+- **Observation**: Scoped result plus availability/error facts and a disposal lifetime.
+- **Operation outcome**: Local acceptance/persistence and later remote settlement, including rejection or unknown outcome.
+- **Backend integration**: Documented owner of SDK-specific configuration, schema/policy mappings, handles, and leaf operations.
 
-### Measurable Outcomes
+## Success Criteria
 
-- **SC-001**: An independently distributed plugin can be integrated into the demonstration with zero edits to foundation source code.
-- **SC-002**: Two real backends pass every scenario for the agreed mandatory foundation capabilities; differences and optional capabilities are explicitly recorded.
-- **SC-003**: Every incompatible version or missing app-required capability in the qualification scenarios produces an actionable failure before the unsupported operation executes.
-- **SC-004**: Identity creation/resumption, recovery, and linking a second device succeed through both qualified backends, with cancellation and failure cases producing no false success.
-- **SC-005**: Unauthorized identities cannot access private workspace data at the storage boundary in every qualified scenario. Additional domain-denial scenarios apply only when an app-specific restriction is explicitly approved; no generic read-only membership behavior is assumed.
-- **SC-006**: Every write acknowledged as locally durable in the qualification scenarios remains available after an offline restart.
-- **SC-007**: Consumers distinguish loading, empty, ready, and error results; disposed observations produce no further consumer updates.
-- **SC-008**: All required shared interactions can be embedded without adopting a foundation-owned screen or router and can be completed with keyboard input.
-- **SC-009**: The demonstration uses identical portable domain schema declarations and consumer data access code with both qualified backends for every agreed required data scenario, without per-app backend adapters for those scenarios.
+- **SC-001**: One minimal consumer completes all agreed identity, workspace, and record scenarios without Finance models or foundation-owned routing.
+- **SC-002**: A source dependency audit finds zero direct Jazz imports in ordinary consumer workflows and presentation; every remaining import has an identified backend integration owner.
+- **SC-003**: All agreed locally usable read/write scenarios complete with zero required remote answers, including a silently unresponsive remote.
+- **SC-004**: Every write acknowledged as locally persisted in acceptance scenarios survives closing all clients and reopening the prepared consumer offline with retained storage.
+- **SC-005**: All private-workspace denial scenarios reject unrelated identities at the storage boundary; all scope-transition scenarios reject stale updates and release obsolete subscriptions.
+- **SC-006**: Recovery in separate browser storage restores the intended identity; every cancellation/failure scenario avoids false success and clears transient secrets.
+- **SC-007**: Every required interaction can be completed with keyboard input, consumer-supplied localization, and no duplicate operation announcements.
+- **SC-008**: V1 acceptance requires only Jazz. Every unsupported guarantee, incomplete-replica scenario, and uncertain-write scenario produces an explicit outcome without silent downgrade, replacement, or duplicate replay.
 
-- **SC-010**: Every declared transaction capability passes its conformance scenarios, including failure/conflict handling and offline restart for atomic local persistence. Every scenario requiring an absent transaction capability fails qualification before dependent operations execute. Subscription visibility limits are recorded separately.
-- **SC-011**: With each qualified backend, two consumer app instances in separate browser storage can explicitly connect to the same user identity. The connection interaction explains the authority granted. Shared identity alone does not imply shared app data. Cross-app data sharing is deferred from v1. If considered later, it requires an explicit request from the requesting app/workspace and user approval of the requested data/access; denied or unrequested access must not be granted. Unauthorized identities cannot access private workspaces.
+- **SC-009**: One focused Finance adoption completes its agreed behavior while an unmigrated workflow continues using the same host session and existing data, with zero required schema/data migrations or unrelated route rewrites.
+- **SC-010**: In all focused-adoption teardown and identity-change scenarios, shared resources have exactly one lifecycle owner, adopted subscriptions/actors are released or rebound appropriately, and closing the adopted interaction leaves the host session usable.
 
-These are future implementation acceptance criteria, not claims that this specification-only phase has exercised or satisfied them. Optional transaction capabilities are qualified separately from the mandatory baseline; an app's required capability set remains authoritative.
+These are future acceptance criteria, not claims of verified foundation behavior.
 
-## Assumptions
+## Assumptions and Deferred Scope
 
-- Primary audiences are app developers, independent plugin authors, and end users interacting with foundation-provided account/workspace compositions.
-- Finance and Clipper are reference consumers, not the only intended apps. Finance's money, ledgers, categories, and grants remain app-domain concepts; no Finance permission-checking code is automatically adopted as a product requirement. Clipper's articles, books, reading state, and capture workflows remain app-domain concepts.
-- All backends, including Jazz, are plugins. The foundation does not promise to author or maintain every plugin, and third-party plugin compliance is distinct from project endorsement or maintenance.
-- DUI is the shared presentation library. Foundation compositions may depend on DUI and Svelte; exact package boundaries and dependency rules belong to later design.
-- DXOS will be evaluated first for the second backend. Its current suitability must be checked before selection; no equivalent identity, permissions, transactions, or storage behavior is assumed.
-- Plugin selection is deployment-level. Runtime installation, a marketplace, user-selectable backends, and migration of existing identities/data between backends are excluded initially.
-- Binary-storage abstraction and app-specific file replication/download policies are deferred. This draft makes no promise of file parity.
-- Clipper starts fresh if later revived. Legacy Webnative/Fission recovery/import, Clipper restoration, and Finance migration are outside this feature.
-- This phase creates a local repository and Spec Kit specification/checklist only: no library/app code, consumer changes, tests, commits, or GitHub publishing.
-- Q1 and Q2 are resolved at the requirements level: the practical portable data baseline and optional transaction capabilities are defined in FR-020/FR-022, and explicit identity reuse with backend-native access behavior is defined in FR-012. Concrete interfaces and conformance design belong to later design. Source investigation establishes native identity reuse paths, not full backend qualification. Universal isolation between apps sharing identity authority is not a requirement; all other required permissions and guarantees still need qualification.
+- This task updates specifications only. No foundation code, tests, consumer integrations/migrations, dependency updates, commits, or publishing are authorized. The focused Finance integration is a future validation requirement, not authorization to perform it now.
+- Jazz works as the current Finance backend; that is extraction evidence, not proof that a reusable foundation already exists or every SDK flow is qualified.
+- Future replaceability means containing coupling and documenting mappings. It does not promise zero-cost migration, identical backend features, or a stable third-party plugin contract today.
+- Separate pairing protocols, additional authentication methods, DXOS qualification, independent backend packages, cross-backend conformance, and schema portability are later work.
+- Clipper revival, financial workflows, bank sync, credential encryption, image editing, generic file replication, and broad background preparation remain outside this MVP.
+- Offline restart requires previously available app assets and retained storage. Offline operation does not establish fresh authorization or erase data already disclosed before revocation.
 
-## Reference Evidence and Follow-up
+## Reference Evidence and Planning Handoff
 
-- Finance's `jazz-session.ts`, `WorkspaceBootstrap.svelte`, `QueryContent.svelte`, and identity setup provide extraction evidence. Existing permission-checking code is reference material only, not an approved user-facing requirement; reuse patterns, not finance-specific assumptions.
-- Clipper's legacy Webnative integration couples identity, metadata, and file storage. It motivates replaceability without bringing binary storage or unrelated access-control assumptions into this spec.
-- [Backend source investigation](research.md) records pinned Jazz and DXOS identity/access findings. DXOS remains the first second-backend candidate; neither source analysis nor documentation review constitutes full qualification.
-- Later UI discovery should review account recovery, device linking, collaboration, and loading behavior in local-first apps, including DXOS Composer. Recommendations must cite the observed behavior and state whether it belongs in DUI or this foundation; that discovery is not an app implementation commitment.
+Reviewed local snapshots on 2026-10-31: Finance `8ff72f6`, DUI `9bc5405`. These are the supplied checkouts, not a claim of a fresh remote fetch.
+
+- Finance uses `jazz-tools@2.0.0-alpha.59`, XState, Svelte 5, and Paraglide. Its vendored DUI archive is `0.0.25-details-animation`; the DUI checkout additionally exports `ButtonContent`. Matching package version numbers do not prove matching archive contents.
+- Finance's `src/lib/machines/identity/{session-startup,recovery-phrase}.ts`, `components/identity/AccountRecovery.svelte`, and `components/workspaces/WorkspaceSelector.svelte` demonstrate typed workflow/view separation and explicit secret handling. Its workspace machines distinguish creation, persistence, reconciliation, integrity, and navigation; extract reusable ownership patterns rather than financial defaults.
+- Finance's `.specify/memory/{xstate,jazz}.md` and spec 013 research record local/remote distinctions and SDK-specific cold-query, permission, acquisition-cost, and worker-persistence limitations. Broad preparation and worker storage sharing MUST NOT be inferred from the existence of local persistence.
+- DUI's `src/lib/index.js` and implementations provide Dialog, Popover, Button, ButtonContent, StatusMessage, LoadingScreen, LoadingSpinner, Select, Textarea, Checkbox, and FieldFeedback. ButtonContent supplies icon/loading content; workflow state remains outside DUI. Existing primitives remove any need to invent replacement dialogs or status controls for this scope.
+- Existing `research.md`, `ui-discovery.md`, `design-review.md`, `data-model.md`, `contracts/foundation.md`, `qualification.md`, and `quickstart.md` preserve earlier investigation/design. Their multi-backend contracts, package layouts, older SDK examples, and qualification gates are historical proposals, not the current MVP implementation authority. Reconcile useful portions in a new reviewed plan before implementation; do not execute the old plan.
+
+- The revised technical plan must define independent adoption entry points, host-owned versus library-owned lifecycle contracts, and a focused Finance validation slice before interface stabilization. This supplements the minimal new-consumer demonstration rather than replacing it.

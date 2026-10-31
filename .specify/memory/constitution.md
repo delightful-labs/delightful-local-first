@@ -1,30 +1,16 @@
-<!-- Sync Impact Report
-Version: 1.0.0 -> 1.0.1 (editorial reconciliation of previously approved decisions).
-Modified principles: VI. Explicit Data and Access Guarantees (resolved-decision reference only).
-Modified sections: Technology Constraints; Development Workflow and Quality; Governance.
-Added sections: none.
-Removed sections: none.
-Q1/Q2 are resolved in the active feature spec; no requirement is reopened or weakened.
-Oxlint/Oxfmt configuration and AGENTS.md reconciliation are complete.
-Deferred design work: application toolchain selection, exact interfaces, backend qualification,
-Svelte/type-check coverage, and UI discovery remain tracked in the feature design artifacts.
-No placeholders remain. Historical planning notes about this amendment may be refreshed in a
-later documentation task; no dependent artifacts were modified by this constitution-only task.
-This report is review scratch material and must be removed before committing the constitution.
--->
-
 # Delightful Local-First Foundation Constitution
 
 ## Core Principles
 
-### I. Independent Backend Plugins
+### I. Jazz-First Delivery with Explicit Backend Boundaries
 
-Every backend, including Jazz, MUST integrate through a versioned public plugin contract and be
-distributable and maintainable independently of the foundation. Backend-specific dependencies MUST
-belong to plugins rather than mandatory foundation dependencies. Compatibility and app-required
-capabilities MUST be validated before dependent operations execute. Missing capabilities MUST produce
-actionable failures, never silently weaker authorization, durability, or data guarantees. Reusable
-conformance checks MUST distinguish contract compliance from qualification for a particular app.
+Jazz is the sole required v1 backend. SDK access MUST remain behind documented integration
+boundaries for identity/session, workspaces/access, and typed consumer data operations. Ordinary
+workflows and presentation MUST NOT call Jazz directly. Consumer-owned SDK-native schemas and
+policies MAY remain in identified integration modules. Future backend replacement MAY require
+schema/policy mapping and migration; source-compatible portability is not promised. Independent
+plugin distribution, a universal schema language, and second-backend qualification are deferred.
+App-required capabilities, permissions, and durability MUST NOT be silently weakened.
 
 ### II. Safe, Explicit TypeScript
 
@@ -47,7 +33,7 @@ machines. Workflow logic MUST remain separate from rendered presentation.
 
 The foundation MUST own reusable identity and workspace behavior, not Finance or Clipper domain
 models or workflows. App-specific permission requirements MUST remain expressible and enforceable
-through plugins. DUI MUST own generic presentation primitives; the foundation MUST compose them for
+through backend integrations. DUI MUST own generic presentation primitives; the foundation MUST compose them for
 identity and workspace interactions. Missing DUI primitives MUST be documented as evidence-based
 recommendations with explicit ownership, rather than assumed to exist or implemented implicitly.
 
@@ -87,11 +73,11 @@ in the active feature specification.
 ### VII. Reviewed and Verified Changes
 
 Future production behavior MUST have appropriate automated coverage: unit tests for logic and state
-machines, reusable plugin conformance checks, and Playwright coverage for user-visible workflows,
+machines, focused backend-boundary checks, and Playwright coverage for user-visible workflows,
 authorization, and offline behavior where feasible. Implementation MUST be reviewed and approved by
 the user before its implementation tests are added or run. After approval, required checks MUST pass
-before the feature is considered complete. Two real backends MUST demonstrate the agreed required
-capabilities; a deterministic fake MAY support routine tests but MUST NOT replace the second backend.
+before the feature is considered complete. Jazz MUST demonstrate the agreed v1 required capabilities; a deterministic fake MAY support routine
+tests but MUST NOT replace verification of Jazz persistence and storage authorization.
 
 ## Technology Constraints
 
@@ -118,8 +104,8 @@ capabilities; a deterministic fake MAY support routine tests but MUST NOT replac
 - Follow the user's resolved Q1 (shared data abstraction) and Q2 (cross-app identity) decisions in
   the active feature specification. Other unanswered consequential decisions MUST remain explicit
   until resolved; dependent contracts MUST NOT treat assumed answers as approved requirements.
-- Jazz and a second real backend MUST qualify against the agreed required capabilities. DXOS is the
-  first candidate to evaluate, not a selected or presumed-compatible backend.
+- Jazz alone MUST qualify against the agreed MVP capabilities. Additional backend evaluation and
+  independent plugin contracts are deferred and MUST NOT gate v1.
 - Complete one task at a time and present it for review before starting another. Change no more than
   one route or component per review cycle unless the user authorizes otherwise.
 - Do not add or run implementation tests before approval of the implementation they cover. Document
@@ -142,7 +128,17 @@ now use Oxlint/Oxfmt. Subsequent design proposals remain subject to their own re
 Constitution versions MUST follow semantic versioning: MAJOR for incompatible principle removals or
 redefinitions, MINOR for new principles or materially expanded guidance, and PATCH for clarifications
 that do not change obligations. Amendments MUST preserve the original ratification date and update
-the last-amended date. Compliance reviews MUST check plugin independence, guarantees, ownership,
+the last-amended date. Compliance reviews MUST check backend boundaries, guarantees, ownership,
 accessibility, unresolved decisions, and the applicable review and validation gates.
 
-**Version**: 1.0.1 | **Ratified**: 2026-10-14 | **Last Amended**: 2026-10-14
+## Amendment Rationale — 2026-10-31
+
+Version 2.0.0 replaces the mandatory independently distributed multi-backend MVP with Jazz-only
+v1 delivery at the user's explicit request. The shared data boundary remains, while portable
+schema expression and a second real backend cease to be release requirements. Strict typing,
+XState ownership, privacy, accessibility, and implementation review gates remain in force.
+The active spec and repository guidance are reconciled in this documentation change. The old
+technical plan is marked superseded; detailed design artifacts require reconciliation in the
+next reviewed planning task before implementation. This amendment does not authorize code.
+
+**Version**: 2.0.0 | **Ratified**: 2026-10-14 | **Last Amended**: 2026-10-31

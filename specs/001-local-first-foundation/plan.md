@@ -1,3 +1,5 @@
+> **Superseded for implementation — 2026-10-31.** The [Jazz-first MVP spec](spec.md) replaces this plan's multi-backend release scope. This document and its linked design/contract/qualification artifacts remain historical proposals. A revised technical plan must reconcile them with the current spec before implementation. No second backend, portable schema compiler, or independent plugin packaging is required for v1. No implementation is authorized by this update.
+
 # Technical Plan: Pluggable Local-First App Foundation
 
 **Branch**: `main` (no dedicated feature branch currently checked out) | **Date**: 2026-10-14 | **Spec**: [spec.md](spec.md)
