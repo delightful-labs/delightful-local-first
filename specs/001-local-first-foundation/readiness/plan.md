@@ -1,6 +1,6 @@
 # Acquired session readiness and retry
 
-Status: design reviewed; initial library runtime implemented for review. No Finance adoption,
+Status: library implementation reviewed and committed as `99faaf0`; approved coverage passes. No Finance adoption,
 archive, dependency-version, catalog, or implementation-test changes. Baselines: library main `7909ec2` (PR #3), Finance main `bf38397`
 (PR #38, including diagnostic fixture correction `9678bd2`). Both planning branches are
 `plan/shared-session-readiness`.
@@ -232,3 +232,30 @@ Static type checks pass with zero Svelte errors/warnings. Focused lint/format, d
 include the new workflow and adapter exports. No unit tests, browser tests, or new consumer fixtures have been added
 or executed. The affected test inventory above is the next review gate; Finance adoption follows
 only after the library behavior and package boundary have approved coverage.
+
+## Approved library verification
+
+The user approved implementation and authorized its commit and coverage on the next review cycle.
+All 33 focused cases pass: 25 readiness workflow cases and eight Jazz adapter cases. Real XState
+actors exercise waiting/SSR-safe no effects, five statuses, binding/epoch correlation, duplicate and
+invalid retry attempts, stale callbacks, read/setup/synchronous-notification failures, reobservation,
+cleanup exceptions, resolved/rejected/synchronously throwing retries, fresh status reads without SDK
+notifications, observation failure during retry, and shutdown priority for both retry outcomes.
+Observer crash routing during issued retry is covered using injected XState error events; this is
+not evidence that arbitrary external actor termination cancels SDK work. The only production-source
+adjustment in this coverage cycle adds the framework observer-error variant to the internal event
+type so those existing error transitions can be exercised without casts. No runtime policy changed.
+
+The Jazz adapter cases use a typed supplied session stub, not a live server. They verify lazy binding,
+exact subscription/cleanup forwarding, all five status projections, and one retry call without
+automatic retry, session creation, close, or logout. They do not qualify the SDK's actual mutation
+or storage behavior; that remains part of Finance adoption verification.
+
+The built-package consumer resolves the new public declarations and runtime entries, performs a
+synthetic bind → retry → refreshed observation → shutdown through the real packaged adapter, and
+checks one retry and one subscription release. NodeNext declaration checks, Node runtime import,
+and Vite consumer build pass. Full source types, package build/strict publint, focused lint/format,
+and diff checks pass. No browser server, credential, schema, archive, or Finance runtime was changed.
+
+Next: review this coverage change, then pack the library and propose the focused Finance adoption
+batch described above. Startup acquisition and restoration remain separate and unchanged.

@@ -34,7 +34,10 @@ type ObservationEvent =
 			observation: number
 			reason: SessionObservationFailure
 	  }
-type Event = SessionReadinessEvent | ObservationEvent
+type Event =
+	| SessionReadinessEvent
+	| ObservationEvent
+	| { type: 'xstate.error.actor.observer'; actorId: string; error: unknown }
 type Context = {
 	reportTo: SessionReadinessInput['reportTo']
 	scope: SessionReadinessScope | undefined

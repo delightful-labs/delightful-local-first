@@ -59,3 +59,18 @@ export type {
 	SessionStartupOutput
 } from 'delightful-local-first/session/contracts'
 export { createJazzSessionAcquisition } from 'delightful-local-first/backend/jazz/session'
+
+export { createSessionReadinessMachine } from 'delightful-local-first/session/workflow'
+export type {
+	SessionReadinessInput,
+	SessionReadinessEvent
+} from 'delightful-local-first/session/workflow'
+export type {
+	SessionStatus,
+	SessionReadinessScope,
+	SessionReadinessCapability,
+	SessionReadinessBinding,
+	SessionReadinessReport,
+	SessionObservationFailure
+} from 'delightful-local-first/session/contracts'
+export { createJazzSessionReadinessAdapter } from 'delightful-local-first/backend/jazz/session-readiness'
