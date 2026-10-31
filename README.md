@@ -2,7 +2,7 @@
 
 Shared local-first app foundation using Jazz for v1, informed by Delightful Finance and Delightful UI. Focused SDK boundaries leave room for future backend replacement.
 
-This repository contains the MVP specification, developer tooling, and the initial recovery workflow. Shared UI, a Jazz adapter, the demonstration app, and Finance adoption remain future work.
+This repository contains the MVP specification, developer tooling, and the initial recovery workflow. It also includes a localized pure recovery view with synthetic Storybook examples. The Jazz adapter, owned integration, full demonstration app, and Finance adoption remain future work.
 
 - [Foundation specification](specs/001-local-first-foundation/spec.md)
 - [Specification quality checklist](specs/001-local-first-foundation/checklists/requirements.md)
@@ -34,10 +34,11 @@ and validates it with publint; run `pnpm check:consumer` afterwards to check bui
 See [developer tooling](docs/development.md) for import boundaries, editor setup, limitations,
 and dependency update/PR conventions. The root package entry remains empty; recovery uses separate exports.
 
-The recovery workflow uses XState. SvelteKit hosting, Jazz integration, DUI compositions, and
+The recovery workflow uses XState; its presentation uses DUI with library-owned Paraglide messages.
+SvelteKit hosting, Jazz integration, owned recovery composition, and
 consumer adoption remain separately scoped implementation work.
 Current unit coverage uses synthetic recovery data; the implementation-review gate still applies to
-new behavior and its tests. No browser suite is configured yet.
+new behavior and its tests. Synthetic Chromium coverage is available through `pnpm test:storybook` after building Storybook.
 
 ## Storybook and Netlify
 
@@ -55,10 +56,14 @@ Netlify site is a separate hosting action; no site is created or published by th
 ## GitHub CI
 
 The `CI` workflow runs on pull requests, pushes to `main`, and manual dispatch. It installs the frozen
-lockfile, checks formatting, lint and types, runs unit coverage, validates the package and consumer fixture, then builds Storybook. Permissions are read-only and superseded
+lockfile, checks formatting, lint and types, runs unit coverage, validates the package and consumer fixture, then builds Storybook and runs synthetic Chromium coverage. Permissions are read-only and superseded
 runs are cancelled. No deployment secrets are required. Branch protection and required checks must be
 configured separately after the workflow is available remotely.
 
 New unit/browser coverage is added only after implementation review. Current unit coverage verifies
-the recovery workflow, not Jazz integration or UI behavior. A separate workflow checks Conventional
+the recovery workflow and localization; browser coverage checks the synthetic recovery UI. Jazz
+integration remains unimplemented and unqualified. A separate workflow checks Conventional
 Commits PR titles.
+
+See [recovery presentation and localization](docs/recovery-view.md) for public imports, message
+overrides, catalog editing, and the current review/verification limits.

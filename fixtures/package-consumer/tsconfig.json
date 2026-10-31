@@ -7,6 +7,6 @@
 		"skipLibCheck": false,
 		"exactOptionalPropertyTypes": false
 	},
-	"include": ["./consumer.ts", "./import.js"],
+	"include": ["./consumer.ts", "./import.js", "./view.ts", "./vite.config.ts"],
 	"exclude": []
 }

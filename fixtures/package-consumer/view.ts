@@ -1,0 +1,3 @@
+// A Svelte-aware bundler must consume the built public view, without a source alias.
+export { AccountRecovery } from 'delightful-local-first/recovery'
+export { createRecoveryMessages } from 'delightful-local-first/recovery/messages'

@@ -33,3 +33,5 @@ jobs:
       - run: pnpm package
       - run: pnpm check:consumer
       - run: pnpm build-storybook
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:storybook

@@ -14,3 +14,7 @@ export {
 	createRecoveryPhraseMachine,
 	selectRecoveryPhraseView
 } from 'delightful-local-first/recovery/workflow'
+
+export { AccountRecovery } from 'delightful-local-first/recovery'
+export { createRecoveryMessages } from 'delightful-local-first/recovery/messages'
+export type { RecoveryMessages } from 'delightful-local-first/recovery/messages'

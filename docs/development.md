@@ -2,7 +2,7 @@
 
 The tooling validates build/package infrastructure and the initial recovery workflow. The root
 entry point remains empty; recovery contracts and workflow have separate public exports. XState
-is an optional peer used by the workflow entry. No Jazz, DUI, or consumer migration is introduced.
+is an optional peer used by the workflow entry. The pure recovery view uses a host-supplied optional DUI peer; no Jazz or consumer migration is introduced.
 The package remains private and no release/publish workflow is configured.
 
 ## Static checks
@@ -15,12 +15,12 @@ Install with `pnpm install --frozen-lockfile`, then run `pnpm verify` for the CI
 - `pnpm check`: strict Svelte diagnostics and TypeScript/JavaScript checks, including configs.
 - `pnpm test:unit --run`: approved recovery machine scenarios using real actors and synthetic data.
 - `pnpm package`: generate `dist` JavaScript/declarations with svelte-package and run strict publint.
-- `pnpm check:consumer`: after packaging, resolve declarations with NodeNext and import built ESM
-  through the public package name. No source path mapping is used.
+- `pnpm check:consumer`: after packaging, resolve declarations with NodeNext, import non-UI ESM,
+  and bundle the public view with Svelte-aware Vite. No source path mapping is used.
 - `pnpm build-storybook`: static documentation build.
 
 The consumer fixture checks root and recovery subpath imports using package self-reference and
-generated `dist` exports. It catches missing
+generated `dist` exports. UI source is consumed by a Svelte-aware build rather than plain Node. It catches missing
 entry points and declaration resolution problems; it is not yet an isolated installed-tarball or
 component rendering check. Publint separately inspects package metadata and publishable files.
 Extend the fixture to real public APIs in the focused implementation that introduces those APIs.
@@ -61,9 +61,14 @@ SDK integration and host-owned lifecycle behavior remain future implementation w
 ## Unit coverage and review
 
 `pnpm test:unit` starts Vitest in watch mode; use `pnpm test:unit --run` for a single run.
-The dedicated Node-only configuration discovers machine tests and does not load SvelteKit or a
+The dedicated Node-only configuration discovers machine and localization tests and does not load SvelteKit or a
 Storybook Vite configuration. Tests are type-checked with the source and run in CI after static checks.
-No Jazz server, user data, browser, or credential is used by this suite.
+No Jazz server, user data, browser, or credential is used by the unit suite.
+
+`pnpm test:storybook` runs the synthetic Chromium recovery scenarios after `pnpm build-storybook`.
+See [recovery presentation](recovery-view.md#running-focused-coverage) for browser installation,
+known-server reuse, and alternate ports. CI builds the static stories and runs those scenarios;
+`pnpm verify` covers the non-browser checks and build.
 
 The recovery suite covers acknowledgement/dismissal, observed and unobserved scope changes,
 A → B → A correlation, delayed resolution/rejection after cancellation, guarded retries, and

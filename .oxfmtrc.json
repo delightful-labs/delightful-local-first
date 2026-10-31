@@ -14,6 +14,9 @@
 		"storybook-static/**",
 		".netlify/**",
 		"dist/**",
-		".svelte-kit/**"
+		".svelte-kit/**",
+		"src/lib/paraglide/**",
+		"project.inlang/cache/**",
+		"vendor/**"
 	]
 }
