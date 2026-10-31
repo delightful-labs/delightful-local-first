@@ -1,7 +1,8 @@
 # Identity restoration: next incremental slice
 
-Status: initial library implementation reviewed; 47 focused restoration tests and built-package
-consumer checks pass. Finance adoption remains the next implementation review.
+Status: initial library implementation reviewed; 81 focused restoration tests and built-package
+consumer checks pass. Finance adoption is committed as `1e63e89`; its focused unit and
+real-session browser checks pass, with verification changes awaiting review.
 No new strings, dependency versions, or Finance runtime changes in this library cycle.
 See [implementation notes](../../../docs/restoration-workflow.md).
 Library branch: `feat/identity-restoration-plan`, based on library main `bde1c77`.
@@ -154,6 +155,6 @@ matching drain, duplicate requests, interruption, same-client restore failure, n
 and authentication invalid input, cross-device restoration, restore failure, and navigation failure
 scenarios. Inspect test doubles against the final protocol before adding/running tests.
 
-Review gate: the initial library implementation and focused tests are complete; real Finance
-session-lifecycle claims must come from the later approved host checks. Ordinary SDK/database operations and workspace migration
+Review gate: library and host implementations are committed; approved focused tests pass.
+Verification changes await review. Broader SDK/session/workspace guarantees remain unqualified. Ordinary SDK/database operations and workspace migration
 remain separate MVP slices.

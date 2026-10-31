@@ -34,3 +34,6 @@ export type {
 	RestorationScope
 } from 'delightful-local-first/restoration/contracts'
 export { createJazzRestorationAdapter } from 'delightful-local-first/backend/jazz/restoration'
+
+export { restorationMachine } from 'delightful-local-first/restoration/workflow'
+export type { SuppliedRestorationInput } from 'delightful-local-first/restoration/workflow'

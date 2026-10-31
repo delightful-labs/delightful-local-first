@@ -3,7 +3,7 @@ import { createAccountManager, exportLocalFirstSecret } from 'jazz-tools'
 import { RecoveryPhrase } from 'jazz-tools/passphrase'
 import { createJazzRecoveryAdapter } from 'delightful-local-first/backend/jazz/recovery'
 import { createJazzRestorationAdapter } from 'delightful-local-first/backend/jazz/restoration'
-import { createRestorationMachine } from 'delightful-local-first/restoration/workflow'
+import { restorationMachine } from 'delightful-local-first/restoration/workflow'
 import { createActor, fromCallback, waitFor } from 'xstate'
 
 /** @type {string | null} */
@@ -68,8 +68,13 @@ try {
 			})
 		)
 	).start()
-	const restoration = createActor(createRestorationMachine(restorationAdapter.capability), {
-		input: { scope: restorationScope, phrase, reportTo: recipient }
+	const restoration = createActor(restorationMachine, {
+		input: {
+			scope: restorationScope,
+			phrase,
+			reportTo: recipient,
+			capability: restorationAdapter.capability
+		}
 	})
 	try {
 		restoration.start()

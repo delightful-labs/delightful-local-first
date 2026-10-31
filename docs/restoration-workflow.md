@@ -35,8 +35,8 @@ Finance acquires its session after defining application readiness. Its host inte
 actor lifetime; replacement requires the normal interruption/settlement protocol and a new actor.
 The existing `createRestorationMachine(capability)` convenience API remains supported. Both entries
 use the same statechart definition and leaf actors; no dynamic registry or manual child startup.
-This refinement passes static/package checks and awaits focused coverage after adoption review.
-The 47 tests recorded below ran before this refinement; they do not qualify the new supplied entry.
+Both APIs now pass the same lifecycle suite, including the invocation-time entry used by Finance.
+The built-package consumer also uses the supplied-capability entry.
 
 ## Lifecycle and output
 
@@ -83,7 +83,8 @@ read/check/write workflow. The host owns the session and all resource-drain deci
 
 ## Verification and remaining adoption
 
-All 47 focused restoration tests pass: 34 machine scenarios and 13 Jazz adapter scenarios.
+All 81 focused restoration tests pass: 34 machine scenarios against each capability entry
+(68 total) and 13 Jazz adapter scenarios.
 The machine tests use real XState actors and a typed recipient, including stale/duplicate permits,
 invalid/empty parsing, interruptions at validation/preparation/restore/identity observation, both
 SDK outcomes after interruption, silent binding changes, partial identity observation, sanitized
@@ -102,7 +103,7 @@ Types, lint, formatting, package build, publint, and the consumer declaration/ru
 No production changes were needed after implementation approval. The test harness uses a small
 local deferred helper to retain the repository's ES2022 TypeScript library baseline.
 
-The next review cycle is the packed Finance adoption: preserve its application-owned drain and
-navigation wrapper, update affected protocol fixtures after reviewing the implementation, and then
-exercise the real host session with protected authentication browser scenarios. No Finance runtime,
-archive, catalogs, or browser tests changed in this library coverage cycle.
+Finance adoption is committed as `1e63e89`, based on main after PR #35 merged. Its updated
+application-owned recovery fixtures pass 34 focused unit scenarios, and ten protected real-session
+authentication scenarios pass. Detailed verification is tracked in Finance's adoption notes. Neither workflow API owns host workspace
+draining or navigation. This library check does not qualify arbitrary SDK/client versions.
