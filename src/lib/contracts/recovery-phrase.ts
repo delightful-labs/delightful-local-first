@@ -8,6 +8,11 @@ export type AvailableRecoveryScope = Readonly<{
 
 export type RecoveryScope = Readonly<{ kind: 'unavailable' }> | AvailableRecoveryScope
 
+/** Host-owned observations. Subscribe publishes current scope and returns its own cleanup. */
+export type RecoveryScopeSource = Readonly<{
+	subscribe: (onScope: (scope: RecoveryScope) => void) => () => void
+}>
+
 /** Keep this capability stable for one actor lifetime; shut down before replacing it. */
 export type RecoveryPhraseCapability = Readonly<{
 	/** One resource-free leaf. Recheck the captured binding before exporting its phrase. */

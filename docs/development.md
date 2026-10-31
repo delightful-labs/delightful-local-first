@@ -2,7 +2,7 @@
 
 The tooling validates build/package infrastructure and the initial recovery workflow. The root
 entry point remains empty; recovery contracts and workflow have separate public exports. XState
-is an optional peer used by the workflow entry. The pure recovery view uses a host-supplied optional DUI peer; no Jazz or consumer migration is introduced.
+is an optional peer used by the workflow entry. The pure recovery view uses a host-supplied optional DUI peer; a separate optional Jazz peer is used only by the new adapter entry. No consumer migration is introduced.
 The package remains private and no release/publish workflow is configured.
 
 ## Static checks

@@ -2,7 +2,8 @@
 
 This cycle adds a pure DUI-based `AccountRecovery` view. It receives a `RecoveryPhraseView` model,
 a complete `RecoveryMessages` object, and callbacks. It creates no actor, Jazz session, subscription,
-or persistence. The owned integration and Jazz adapter remain later work.
+or persistence. The [owned integration and Jazz adapter](recovery-integration.md) are now implemented separately
+for review; this document describes the pure-view boundary.
 
 ## Public imports
 

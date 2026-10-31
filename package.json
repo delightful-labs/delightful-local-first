@@ -23,6 +23,7 @@
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "2.27.0",
+		"@opentelemetry/api": "1.9.1",
 		"@playwright/test": "1.60.0",
 		"@storybook/addon-docs": "10.6.2",
 		"@storybook/addon-svelte-csf": "5.1.5",
@@ -31,6 +32,7 @@
 		"@sveltejs/vite-plugin-svelte": "7.2.0",
 		"@types/node": "24.19.2",
 		"delightful-ui": "file:vendor/delightful-ui-0.0.25-details-animation.tgz",
+		"jazz-tools": "2.0.0-alpha.59",
 		"oxfmt": "0.73.0",
 		"oxlint": "1.88.0",
 		"publint": "0.3.25",
@@ -66,6 +68,15 @@
 		"./recovery/contracts": {
 			"types": "./dist/contracts/recovery-phrase.d.ts",
 			"default": "./dist/contracts/recovery-phrase.js"
+		},
+		"./recovery/svelte": {
+			"types": "./dist/integrations/identity/RecoveryPhrase.svelte.d.ts",
+			"svelte": "./dist/integrations/identity/RecoveryPhrase.svelte",
+			"default": "./dist/integrations/identity/RecoveryPhrase.svelte"
+		},
+		"./backend/jazz/recovery": {
+			"types": "./dist/backend/jazz/recovery-phrase.d.ts",
+			"default": "./dist/backend/jazz/recovery-phrase.js"
 		}
 	},
 	"svelte": "./dist/index.js",
@@ -77,6 +88,7 @@
 	],
 	"peerDependencies": {
 		"delightful-ui": "0.0.25",
+		"jazz-tools": "2.0.0-alpha.59",
 		"svelte": "^5.57.2",
 		"xstate": "5.33.2"
 	},
@@ -85,6 +97,9 @@
 			"optional": true
 		},
 		"delightful-ui": {
+			"optional": true
+		},
+		"jazz-tools": {
 			"optional": true
 		}
 	}

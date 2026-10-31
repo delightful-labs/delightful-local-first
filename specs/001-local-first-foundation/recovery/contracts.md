@@ -61,12 +61,12 @@ validate a host-issued account handle through the installed package in Finance.
 ## UI and Localization
 
 Pure view props: a discriminated recovery view model, a complete RecoveryMessages object, and typed
-callbacks for reveal, retry, acknowledgement changes, and hide. It does not receive an actor ref,
+callbacks for reveal, retry, and hide. The user removed acknowledgement controls during view review. It does not receive an actor ref,
 SDK handle, or multiple flags from which it must infer authorization. Owned composition adds initial
 scope/current observations and the leaf capability; its actor lifetime is independent from messages.
 
-The message contract includes description, heading, show, warning, phraseLabel, acknowledgement,
-acknowledgedClose, close, pending, failure, and retry as actually rendered. The factory resolves
+The implemented message contract includes description, heading, show, warning, phraseLabel,
+close, pending, failure, unavailable, and retry. The factory resolves
 reusable actions/nouns/labels internally and returns full strings rather than exposing catalog keys.
 No string interpolation receives phrase text. Security instructions stay contextual whole messages.
 
@@ -85,8 +85,7 @@ locale before packaging and keep static/per-locale specialization disabled.
 
 DUI supplies native dialog and fields. Derive unique warning/field/heading associations per instance;
 never copy Finance's fixed IDs. All close/Escape/backdrop/unmount/scope-invalidation paths reach the
-same idempotent clear path. Users may dismiss without acknowledging; only the explicit acknowledged
-completion uses a distinct COMPLETE command accepted only in confirmed state. Keep loading/failure feedback in one non-secret live
+same idempotent clear path. The view exposes one Close action with no acknowledgement requirement. Keep loading/failure feedback in one non-secret live
 region and phrase out of live announcements. Use existing DUI tokens and scoped layout only; no
 implicit theme/reset import or new public CSS properties are needed.
 
@@ -111,3 +110,7 @@ one referenced archive per dependency according to Finance's working agreements.
 A built-package consumer checks types/subpath exports independently of source aliases. The later
 Finance integration is the runtime proof of host-session/module identity and continued unrelated
 workflow usability. Both checks are required; neither alone stabilizes the interfaces.
+
+The owned source/capability composition and Jazz adapter are documented in
+[recovery integration](../../../docs/recovery-integration.md). Their runtime verification remains
+pending implementation review and the separately authorized Finance adoption.
