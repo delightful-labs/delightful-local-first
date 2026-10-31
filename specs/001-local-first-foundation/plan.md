@@ -130,8 +130,15 @@ The recovery reveal implementation and approved coverage are merged into library
 `42d001c`. The UI uses a single Close action without acknowledgement. Earlier acknowledgement
 references above describe the original plan; the current view contract and adoption notes govern
 shipped presentation. The advanced workflow's legacy confirmation states are not part of the UI.
-Finance adoption is PR #35 (`ce82dd4`), locally verified and awaiting its own CI/merge.
+Finance recovery adoption PR #35 and restoration adoption PR #37 are merged.
 
-The next focused proposal is [identity restoration](restoration/plan.md): a reusable invoked
-restoration child while Finance retains workspace draining, application lifetime, and navigation.
-This is a design review boundary, not permission to bypass implementation/test review.
+The subsequent [identity restoration slice](restoration/plan.md) is implemented and merged while
+Finance retains workspace draining, application lifetime, and navigation. The next design boundary
+is session startup, below; implementation/test review still applies.
+
+## Session startup continuation
+
+Library restoration PR #2 and Finance adoption PR #37 are merged. The next ownership review is
+[session startup and resume](startup/plan.md), informed by Finance main `4905793`. Its acquisition
+owner survives application attachments; Finance keeps workspace cleanup and identity/navigation
+coordination. This plan does not authorize implementation tests before their implementation review.

@@ -90,6 +90,18 @@
 		"./backend/jazz/restoration": {
 			"types": "./dist/backend/jazz/restoration.d.ts",
 			"default": "./dist/backend/jazz/restoration.js"
+		},
+		"./session/contracts": {
+			"types": "./dist/contracts/session.d.ts",
+			"default": "./dist/contracts/session.js"
+		},
+		"./session/workflow": {
+			"types": "./dist/session.d.ts",
+			"default": "./dist/session.js"
+		},
+		"./backend/jazz/session": {
+			"types": "./dist/backend/jazz/session.d.ts",
+			"default": "./dist/backend/jazz/session.js"
 		}
 	},
 	"svelte": "./dist/index.js",
