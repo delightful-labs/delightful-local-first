@@ -3,3 +3,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Generated Storybook and hosting state
+storybook-static/
+.netlify/

@@ -48,16 +48,16 @@ for evidence and limits.
 
 ## Constitution Check
 
-| Gate                                                                            | Result                                                                                       |
-| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Independently distributable backends, no mandatory backend dependencies in core | Required design boundary; no implementation claim                                            |
-| Strict typing and explicit XState lifecycle/cleanup                             | Required; implementation checks remain pending                                               |
-| Domain behavior outside foundation; DUI owns generic presentation               | Preserved                                                                                    |
-| Portable v1 data contract and optional transactions                             | Requirements resolved; remaining semantics need design/research                              |
-| Reused identity with documented native access consequences                      | Required; cross-app data-sharing workflow deferred from v1                                   |
-| Private workspace protection; no generic read-only or Finance policy             | Private workspace isolation is mandatory; app-specific domain restrictions are outside the v1 baseline |
-| Two real backends meet mandatory requirements                                   | Future acceptance gate; not a prerequisite to designing conformance                          |
-| Specification-only scope, incremental review, approval before tests             | Satisfied by documentation-only work                                                         |
+| Gate                                                                            | Result                                                                                                 |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Independently distributable backends, no mandatory backend dependencies in core | Required design boundary; no implementation claim                                                      |
+| Strict typing and explicit XState lifecycle/cleanup                             | Required; implementation checks remain pending                                                         |
+| Domain behavior outside foundation; DUI owns generic presentation               | Preserved                                                                                              |
+| Portable v1 data contract and optional transactions                             | Requirements resolved; remaining semantics need design/research                                        |
+| Reused identity with documented native access consequences                      | Required; cross-app data-sharing workflow deferred from v1                                             |
+| Private workspace protection; no generic read-only or Finance policy            | Private workspace isolation is mandatory; app-specific domain restrictions are outside the v1 baseline |
+| Two real backends meet mandatory requirements                                   | Future acceptance gate; not a prerequisite to designing conformance                                    |
+| Specification-only scope, incremental review, approval before tests             | Satisfied by documentation-only work                                                                   |
 
 Q1/Q2 were resolved explicitly by the user; the constitution's rule to preserve them until
 resolution no longer prevents dependent research. Constitution v1.0.1 reconciles the historical references to unanswered questions and pending
@@ -155,8 +155,8 @@ its implementation cost must not be disguised by backend-specific types leaking 
   Paraglide functions. The foundation does not own global locale or app routing.
 - The validation guide covers every success-criterion group, including fail-closed startup,
   private workspace protection, query parity, offline restart, optional transactions, identity reuse
-disclosure, and accessible/localized interactions. Domain-policy scenarios are excluded unless an
-additional consumer requirement is separately approved.
+  disclosure, and accessible/localized interactions. Domain-policy scenarios are excluded unless an
+  additional consumer requirement is separately approved.
 
 ## Post-Design Constitution Review
 

@@ -12,11 +12,11 @@ a real quantity uses the actual count. Do not append English suffixes or branch 
 
 Share reusable verbs under `actions` and label structures under `labels`. For example:
 
-| Key | Message | Input |
-| --- | --- | --- |
-| `actions.select_subject` | `Select {subject}` | localized workspace noun |
-| `labels.subject_name` | `{subject} name` | singular localized noun |
-| `labels.all_subjects` | `All {subjects}` | plural localized noun |
+| Key                         | Message                   | Input                                 |
+| --------------------------- | ------------------------- | ------------------------------------- |
+| `actions.select_subject`    | `Select {subject}`        | localized workspace noun              |
+| `labels.subject_name`       | `{subject} name`          | singular localized noun               |
+| `labels.all_subjects`       | `All {subjects}`          | plural localized noun                 |
 | `status.saved_subject_name` | `{subject} {name} saved.` | localized noun and actual record name |
 
 Use `subject` for a noun, `subjects` for a plural noun, and `name` for a user-assigned name.
