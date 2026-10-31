@@ -12,6 +12,8 @@
 		".specify/scripts/**",
 		"pnpm-lock.yaml",
 		"storybook-static/**",
-		".netlify/**"
+		".netlify/**",
+		"dist/**",
+		".svelte-kit/**"
 	]
 }

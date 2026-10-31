@@ -27,9 +27,14 @@ Use Node.js 22.17+ on the 22.x line, or Node.js 24+ and pnpm 10.22.0. Run `pnpm 
 
 Inherited Spec Kit scripts, templates, and skills are excluded from formatting and linting. Avoid formatting unrelated files when making changes; use `pnpm exec oxfmt <paths>` for a focused change.
 
-There is no application code yet, so linting currently has no source files to inspect and permits an empty file set. Oxlint checks Svelte script blocks, but does not provide Svelte template linting. Strict TypeScript/Svelte checking and full enforcement of the no-assertion and no-switch conventions must be completed before application implementation; the current lint command is not a complete constitution compliance check. See [Oxc compatibility](https://oxc.rs/compatibility).
+`pnpm check` runs strict Svelte and TypeScript checks. `pnpm package` builds the private package
+and validates it with publint; run `pnpm check:consumer` afterwards to check built public exports.
+`pnpm verify` runs all static, package, consumer, and Storybook checks in CI order.
+See [developer tooling](docs/development.md) for import boundaries, editor setup, limitations,
+and dependency update/PR conventions. The package entry point remains empty pending implementation.
 
-XState, SvelteKit, Jazz, DUI, and application dependencies remain separately scoped implementation work. Svelte and Vite are currently installed for the Storybook workbench only. No application tests are configured.
+XState, SvelteKit, Jazz, DUI, and application behavior remain separately scoped implementation work.
+No application tests are configured; the existing implementation-review gate still applies.
 
 ## Storybook and Netlify
 
@@ -47,9 +52,9 @@ Netlify site is a separate hosting action; no site is created or published by th
 ## GitHub CI
 
 The `CI` workflow runs on pull requests, pushes to `main`, and manual dispatch. It installs the frozen
-lockfile, checks formatting and lint, then builds Storybook. Permissions are read-only and superseded
+lockfile, checks formatting, lint and types, validates the package and consumer fixture, then builds Storybook. Permissions are read-only and superseded
 runs are cancelled. No deployment secrets are required. Branch protection and required checks must be
 configured separately after the workflow is available remotely.
 
-Unit/browser tests and application type checks will be added with their reviewed implementations;
-this CI configuration does not imply those checks already exist or verify foundation behavior.
+Unit/browser tests will be added with their reviewed implementations. Current static/build checks
+do not verify foundation runtime behavior. A separate workflow checks Conventional Commits PR titles.

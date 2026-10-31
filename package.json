@@ -11,17 +11,46 @@
 		"format:check": "oxfmt --check .",
 		"lint": "oxlint --deny-warnings --no-error-on-unmatched-pattern .",
 		"storybook": "storybook dev --host 127.0.0.1 --port 6006 --exact-port --disable-telemetry",
-		"build-storybook": "storybook build --disable-telemetry"
+		"build-storybook": "storybook build --disable-telemetry",
+		"check": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings && tsc --noEmit --project tsconfig.json",
+		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+		"package": "svelte-package --input src/lib --output dist && publint --strict",
+		"check:consumer": "tsc --noEmit --project fixtures/package-consumer/tsconfig.json && node fixtures/package-consumer/import.js",
+		"verify": "pnpm format:check && pnpm lint && pnpm check && pnpm package && pnpm check:consumer && pnpm build-storybook"
 	},
 	"devDependencies": {
-		"oxfmt": "0.73.0",
-		"oxlint": "1.88.0",
 		"@storybook/addon-docs": "10.6.2",
 		"@storybook/addon-svelte-csf": "5.1.5",
 		"@storybook/svelte-vite": "10.6.2",
+		"@sveltejs/package": "3.0.2",
 		"@sveltejs/vite-plugin-svelte": "7.2.0",
+		"@types/node": "24.19.2",
+		"oxfmt": "0.73.0",
+		"oxlint": "1.88.0",
+		"publint": "0.3.25",
 		"storybook": "10.6.2",
 		"svelte": "5.57.2",
+		"svelte-check": "4.6.0",
+		"typescript": "6.0.3",
 		"vite": "8.3.0"
+	},
+	"version": "0.0.0",
+	"description": "Reusable local-first identity and workspace foundations for Delightful apps.",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"peerDependencies": {
+		"svelte": "^5.57.2"
 	}
 }

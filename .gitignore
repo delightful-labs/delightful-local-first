@@ -7,3 +7,8 @@ node_modules/
 # Generated Storybook and hosting state
 storybook-static/
 .netlify/
+
+# Generated library packages
+dist/
+*.tgz
+.svelte-kit/

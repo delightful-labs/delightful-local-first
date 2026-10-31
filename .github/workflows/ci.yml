@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   checks:
-    name: Formatting, lint, and Storybook build
+    name: Static checks, package, consumer, and Storybook
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -23,9 +23,12 @@ jobs:
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm format:check
       - run: pnpm lint
+      - run: pnpm check
+      - run: pnpm package
+      - run: pnpm check:consumer
       - run: pnpm build-storybook
