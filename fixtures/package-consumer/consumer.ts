@@ -74,3 +74,20 @@ export type {
 	SessionObservationFailure
 } from 'delightful-local-first/session/contracts'
 export { createJazzSessionReadinessAdapter } from 'delightful-local-first/backend/jazz/session-readiness'
+
+export {
+	createWorkspaceSelectionMachine,
+	selectWorkspaceLease
+} from 'delightful-local-first/workspace/workflow'
+export type { WorkspaceSelectionInput } from 'delightful-local-first/workspace/workflow'
+export type {
+	WorkspaceSelectionScope,
+	WorkspaceSelectionRequest,
+	WorkspaceDirectory,
+	WorkspaceSelectionObservation,
+	WorkspaceLease,
+	WorkspaceDrainRequest,
+	WorkspaceSelectionEvent,
+	WorkspaceSelectionReport,
+	WorkspaceSelectionOutput
+} from 'delightful-local-first/workspace/contracts'

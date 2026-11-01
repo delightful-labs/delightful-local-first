@@ -1,7 +1,9 @@
 # Core Contract Consistency Review
 
-**Scope**: Specification/design review only. No implementation, executable conformance, or
-backend certification. The current branch is `main`; this review creates no branch or commit.
+**Status**: Historical review of the retired multi-backend proposal. Its requirement numbering,
+two-backend gates and portable-schema assumptions are superseded by the [Jazz-first specification](spec.md).
+Current delivered slices and remaining work are recorded in [the plan](plan.md). This document is
+not a current implementation or release checklist.
 
 ## Corrections Applied
 

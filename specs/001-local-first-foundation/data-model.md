@@ -1,7 +1,6 @@
 # Foundation Data Model — Design Draft
 
-**Status**: Proposed for review, not a persisted schema or stabilized API. Read alongside
-[the contract](contracts/foundation.md) and [backend evidence](qualification.md).
+**Status**: Historical portable-schema design, superseded for v1 by the [Jazz-first specification](spec.md) and [current contract](contracts/foundation.md). The portable descriptors and plugin mappings below are deferred research, not implemented APIs or v1 prerequisites.
 
 ## Ownership and Identifiers
 

@@ -1,8 +1,6 @@
 # Design Review and Future Validation Guide
 
-**Status**: Documentation-only. The library, plugins, demo, and conformance runner do not exist.
-This guide distinguishes commands available now from future acceptance scenarios; it does not
-authorize implementation or tests before review.
+**Status**: Historical broad acceptance proposal. Its plugin/schema scaffolding is deferred and must not be treated as an implemented quickstart. Use `package.json`, the capability-specific recovery/startup/readiness/workspace plans, and the [current contract map](contracts/foundation.md) for delivered entry points and validation commands.
 
 ## Available Now
 

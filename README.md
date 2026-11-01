@@ -2,12 +2,18 @@
 
 Shared local-first app foundation using Jazz for v1, informed by Delightful Finance and Delightful UI. Focused SDK boundaries leave room for future backend replacement.
 
-This repository contains the MVP specification, developer tooling, and the initial recovery workflow. It also includes a localized pure recovery view with synthetic Storybook examples. The owned Svelte integration and Jazz adapter are implemented and covered. Finance adoption is locally verified in PR #35 and awaits CI/merge; the full demonstration app remains future work.
+This repository contains the Jazz-only MVP specification, developer tooling, recovery presentation,
+identity restoration, session acquisition/readiness, and workspace-selection workflows. Recovery and
+session integrations are already adopted in Finance; the current workspace slice adds shared leases
+and coordinated resource drain. The full MVP and independent demonstration consumer remain future
+work. See the [current contract map](specs/001-local-first-foundation/contracts/foundation.md) for
+implemented subpath exports and the [workspace plan](specs/001-local-first-foundation/workspaces/plan.md)
+for selection ownership and qualification.
 
 - [Foundation specification](specs/001-local-first-foundation/spec.md)
 - [Specification quality checklist](specs/001-local-first-foundation/checklists/requirements.md)
 
-The [recovery first-slice plan](specs/001-local-first-foundation/plan.md) guides incremental adoption in Finance. A second backend, portable schemas, and independent plugins are deferred.
+The [implementation plan](specs/001-local-first-foundation/plan.md) records delivered slices and remaining work. A second backend, portable schemas, and independent plugins are deferred.
 
 ## Spec Kit
 
@@ -15,7 +21,7 @@ The repository is bootstrapped from the existing local Spec Kit 1.1.3 scaffold b
 
 The [project constitution](.specify/memory/constitution.md) is adopted, with governance adapted from Finance and explicit backend integration boundaries.
 
-Use the local Spec Kit skills for later focused planning. The recovery plan replaces the old multi-backend design for this slice.
+Use the local Spec Kit skills for later focused planning. The active Jazz-first specification and current contract replace the old multi-backend design.
 
 ## Tooling
 
@@ -36,7 +42,7 @@ and dependency update/PR conventions. The root package entry remains empty; reco
 
 The recovery workflow uses XState; its presentation uses DUI with library-owned Paraglide messages.
 The Jazz adapter and owned recovery composition have unit, SSR, package-consumer, and synthetic
-browser coverage. Finance PR #35 locally qualifies the packed snapshot against its existing session.
+browser coverage. Finance validates packed snapshots incrementally against its existing host session and schemas.
 SvelteKit hosting remains later work; the implementation-review gate still applies to new behavior
 and its tests. Synthetic Chromium coverage is available through `pnpm test:storybook` after building Storybook.
 

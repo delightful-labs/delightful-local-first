@@ -1,9 +1,9 @@
 # Acquired session readiness and retry
 
-Status: library implementation reviewed and committed as `99faaf0`; approved coverage passes. No Finance adoption,
-archive, dependency-version, catalog, or implementation-test changes. Baselines: library main `7909ec2` (PR #3), Finance main `bf38397`
-(PR #38, including diagnostic fixture correction `9678bd2`). Both planning branches are
-`plan/shared-session-readiness`.
+Status: library implementation/coverage and Finance adoption merged in library PR #4 and Finance
+PR #39, at `9372e0a` and `f83be67`. The design below records the reviewed boundary; initial baseline
+observations and implementation review notes are historical. See the completion record at the end.
+The next proposed slice is [workspace lifecycle](../workspaces/plan.md).
 
 ## Scope and evidence
 
@@ -259,3 +259,12 @@ and diff checks pass. No browser server, credential, schema, archive, or Finance
 
 Next: review this coverage change, then pack the library and propose the focused Finance adoption
 batch described above. Startup acquisition and restoration remain separate and unchanged.
+
+## Merged adoption completion
+
+Finance adoption and verification are merged. Its 68 focused unit cases, 11 authentication cases,
+two production cold/offline cases, and debug on/off startup diagnostics pass, with standard source
+and browser-test type checks. Finance retains its session provider, domain schema, workspace cleanup,
+restoration, and navigation; the library owns acquired-session observation and issued retry. The
+transfer fixture follow-up `75b7376` passed three two-worker runs while checking conflict updates in
+the active workspace. No new session-disposal or general crash-cancellation guarantee was established.

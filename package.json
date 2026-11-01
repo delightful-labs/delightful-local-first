@@ -106,6 +106,14 @@
 		"./backend/jazz/session-readiness": {
 			"types": "./dist/backend/jazz/session-readiness.d.ts",
 			"default": "./dist/backend/jazz/session-readiness.js"
+		},
+		"./workspace/contracts": {
+			"types": "./dist/contracts/workspace-selection.d.ts",
+			"default": "./dist/contracts/workspace-selection.js"
+		},
+		"./workspace/workflow": {
+			"types": "./dist/machines/workspaces/selection.d.ts",
+			"default": "./dist/machines/workspaces/selection.js"
 		}
 	},
 	"svelte": "./dist/index.js",
