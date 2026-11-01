@@ -1,7 +1,10 @@
 # Workspace lifecycle: selection, then private creation
 
-Status: selection and Finance handoff are implemented; final pending-write and cold-start
-qualification is in progress. Private creation, schema/catalog changes, invitations and generic data
+Status: selection and Finance handoff are implemented. Cold-start qualification passes, but final
+transfer-recovery qualification is blocked: a locally persisted three-row transfer remains globally
+unacknowledged and the pinned SDK waits for sync during identity restoration. Normal switching,
+bank-write recovery, and earlier identity checks pass; the failing transfer recovery regression
+remains enabled. Keep both PRs draft until the cause is corrected and required CI passes. Private creation, schema/catalog changes, invitations and generic data
 operations are outside this slice. Baselines: library main `9372e0a` (PR #4), Finance main `f83be67`
 (PR #39). Both feature branches: `plan/workspace-lifecycle`.
 
