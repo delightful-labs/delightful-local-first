@@ -1,11 +1,14 @@
 # Workspace lifecycle: selection, then private creation
 
-Status: selection and Finance handoff are implemented. Cold-start qualification passes, but final
-transfer-recovery qualification is blocked: a locally persisted three-row transfer remains globally
-unacknowledged and the pinned SDK waits for sync during identity restoration. Normal switching,
-bank-write recovery, and earlier identity checks pass; the failing transfer recovery regression
-remains enabled. Keep both PRs draft until the cause is corrected and required CI passes. Private creation, schema/catalog changes, invitations and generic data
-operations are outside this slice. Baselines: library main `9372e0a` (PR #4), Finance main `f83be67`
+Status: selection and Finance handoff are implemented. Cold-start qualification passes. The
+transfer-recovery blocker is corrected locally by the user-approved acyclic Finance insertion policy:
+new manual endpoints derive authority from existing account facts, and transfer insertion still
+validates both endpoint facts and both account grants. Authorized manual orphan markers are explicitly
+an application integrity boundary. The held-write recovery regression now passes with its records
+retained. All 102 full-policy cases and 21 focused browser scenarios pass, including
+creation/linking/deletion checks; source/service-worker and browser-test types pass. Refreshed green
+CI remains a merge gate. Private creation, schema/catalog changes, invitations and generic data operations remain
+outside this slice. Baselines: library main `9372e0a` (PR #4), Finance main `f83be67`
 (PR #39). Both feature branches: `plan/workspace-lifecycle`.
 
 ## Scope and delivery order
